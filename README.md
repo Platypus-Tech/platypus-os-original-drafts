@@ -4,7 +4,7 @@ The basic kernel for Platypus OS. Because Platypus OS is a totally new thing (Ok
 I reealized that I have nothing here about how to get around. So, here we go:
 ***
 ### The `.github` folder
-That's my code scanning thing
+That's my code scanning thing and Dependabot *thang*
 ### The `command lines` folder
 That is where everything relating to the command lines goes
 #### The `platypusPrompt `folder
