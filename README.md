@@ -1,7 +1,7 @@
 # Platypus Kernel
-The basic kernel for Platypus OS. Because Platypus OS is a totally new thing (Ok, maybe not totally, there are some, actually, a lot of files from the Linux kernel), it has an (almost) totally new kernel. This is where it all goes.
+The basic kernel for Platypus OS. Because Platypus OS is a totally new thing (Ok, maybe not totally, there are some, actually, a lot of files from the Linux kernel), it has an (almost) totally new kernel. This is where it all goes. NOTE, **THIS IS IN BETA STAGE. IF IT CRASHES, IT'S NOT MY FAULT. THANK YOU GNU PROJECT FOR PUTTING THAT IN YOUR LICENSE**
 ## How to get around
-I reealized that I have nothing here about how to get around. So, here we go:
+I realized that I have nothing here about how to get around. So, here we go:
 ***
 ### The `.github` folder
 That's my code scanning thing and Dependabot *thang*
