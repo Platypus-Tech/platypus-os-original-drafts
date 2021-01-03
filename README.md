@@ -20,3 +20,5 @@ This is really important. That is where everything security related goes.
 Contributing is covered in most other repositories, it applies to this. Thank you!
 ## This used to be the kernel! What happened?
 This was the kernel, then I decided I would make this the desktop, and then the kernel repository would come along later, once this was fully developed.
+## This has a lot if GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
+GNU/Platypus OS to avoid controversy.
