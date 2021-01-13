@@ -1,3 +1,4 @@
+/*
 #import <stdio.h>	
 main(){
 	// important variables
@@ -81,3 +82,4 @@ main(){
 					}
 		}
 	}
+*/
