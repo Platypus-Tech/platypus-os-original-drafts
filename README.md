@@ -9,6 +9,8 @@ That's my code scanning thing and Dependabot thing
 That is where everything relating to the command lines goes
 #### The `platypusPrompt `folder
 That is where the command line for logging in, and other stuff goes, it is in another repository.
+#### The `bash` folder
+That is where I am (slowly but steadily) putting in the code from the bash shell.
 ### The `Desktop tools` folder
 This is where the desktop environment goes, if I could only upload a folder.
 ### The `internet-stuff` folder
