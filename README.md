@@ -13,8 +13,8 @@ That is where the command line for logging in, and other stuff goes, it is in an
 That is where I am (slowly but steadily) putting in the code for the bash shell from the [source tarball](https://github.com/Platypus-Tech/platypus-os-desktop-alpha/blob/main/command%20lines/bash-5.0.tar.gz).
 ### The `Desktop tools` folder
 This is where the desktop environment goes, if I could only upload a folder.
-### The `internet-stuff` folder
-This is where internet stuff goes.
+### The `net` folder
+This is where internet stuff goes. I'm getting it from the Linux Kernel.
 ### The `security` folder
 This is really important. That is where everything security related goes.
 ***
