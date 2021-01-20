@@ -23,12 +23,12 @@ This is the code for the New Technology Filesystem.
 This is really important. That is where everything security related goes.
 ***
 ## Support for things
-Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports.
+Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it, or work woth you on it.*
 ### Filesystems
 1. The Unix Filesystem
 2. The New Technology File System
 ### Internet
-No support, I don't think. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it.*
+No support, I don't think.
 ***
 ## Contributing
 Contributing is covered in most other repositories, it applies to this. Thank you!
