@@ -13,8 +13,22 @@ That is where I am (slowly but steadily) putting in the code for the bash shell 
 This is where the desktop environment goes, if I could only upload a folder.
 ### The `net` folder
 This is where internet stuff goes. I'm getting it from the Linux Kernel.
+### The `fs` folder
+This is filesystem stuff. I'm getting it from the Linux Kernel.
+#### The `ufs` folder
+This is the code for the Unix Filesystem.
+#### The `ntfs` folder
+This is the code for the New Technology Filesystem.
 ### The `security` folder
 This is really important. That is where everything security related goes.
+***
+## Support for things
+Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports.
+### Filesystems
+1. The Unix Filesystem
+2. The New Technology File System
+### Internet
+No support, I don't think. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it.*
 ***
 ## Contributing
 Contributing is covered in most other repositories, it applies to this. Thank you!
