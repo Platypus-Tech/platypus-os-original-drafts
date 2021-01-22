@@ -10,4 +10,4 @@ where they are placed. The first player to destroy all ships wins the game.
 
 ## License
 
-This project is licensed under GPL-2.O-or-later.
+This project is licensed under GPL-2.0-or-later.
