@@ -21,6 +21,8 @@ This is the code for the Unix Filesystem.
 This is the code for the New Technology Filesystem.
 ### The `security` folder
 This is really important. That is where everything security related goes.
+### The `licenses` folder
+This is where all the licenses go.
 ***
 ## Support for things
 Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it, or work with you on it.*
