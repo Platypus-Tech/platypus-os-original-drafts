@@ -4,4 +4,6 @@
  * displays a made-up ad advertising Atomic Kitty    *
  * Litter.                                           *
  *****************************************************/
-#include "../cprompt.h"
+#include "../../libraries/cli/cprompt.h"
+
+prtscnPrompt();
