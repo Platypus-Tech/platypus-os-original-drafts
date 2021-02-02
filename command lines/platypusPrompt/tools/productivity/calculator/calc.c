@@ -3,4 +3,19 @@
  * (c) DamieFC 2021                                           *
  **************************************************************/
  
- #include "/* whatever it was called */"
+#include "../../../../libraries/cli/cprompt.h"
+
+int main(){
+	if (input == "calc" || "calculator"){
+		printf("------------------------------------------------");
+		printf("| THE 1 & ONLY (No, there's a lot) CALCULATOR! |");
+		printf("Supports up to 3 numbers");
+		printf("First number: ");
+		int firstnum
+		char firstop
+		int secnum
+		char secop
+		int thirdnum
+		char thirdop
+	}
+}
