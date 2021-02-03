@@ -1,4 +1,4 @@
-#include "nmap.h"
+#include "../../../../libraries/hacking/nmap.h"
 
 /* global options */
 short debugging = DEBUGGING;
