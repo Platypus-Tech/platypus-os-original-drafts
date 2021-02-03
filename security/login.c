@@ -3,10 +3,11 @@
  * (c) DamieFC 2021										*
  ********************************************************/
 #include "../libraries/cli/cprompt.h"
+#include "logininfo.h"
 #include <stdio.h>
 
 int main(){
-	char loginprompt = "login"
+	char loginprompt = "Type \"login\" to login: "
 	printf("loginprompt");
 	scanf("%s", input)
 	if (input == "login"){
