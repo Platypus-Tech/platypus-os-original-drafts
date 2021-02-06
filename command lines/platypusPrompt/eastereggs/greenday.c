@@ -1,7 +1,9 @@
 /*******************************************************************
  * This file, greenday.c, is licensed under the GNU General Public *
  * License. That means you can use this however you want, as long  *
- * as you keep the same license or a compatable license.           */
+ * as you keep the same license or a compatable license. Green Day *
+ * is a trademark of Green Day, inc. Don't say I didn't warn you.  *
+ *******************************************************************/
 #include "cprompt.h"
 
 int main(){
