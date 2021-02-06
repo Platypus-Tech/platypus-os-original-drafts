@@ -5,5 +5,9 @@
  * move it to the /security folder.                                           *
  ******************************************************************************/
  
- #include "../../../../libraries/cli/cprompt.h"
- #include "../../../../security/logininfo.h"
+#include "../../../../libraries/cli/cprompt.h"
+#include "../../../../security/logininfo.h"
+
+int main(){
+	
+}
