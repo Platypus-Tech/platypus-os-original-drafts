@@ -25,7 +25,7 @@ This is really important. That is where everything security related goes.
 This is where all the licenses go.
 ***
 ## Support for things
-Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it, or work with you on it.*
+Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it, or work with you on it. I'm pretty active here so I'll get to you within a reasonable amount of time, never more than a day.*
 ### Filesystems
 1. The Unix Filesystem
 2. The New Technology File System
