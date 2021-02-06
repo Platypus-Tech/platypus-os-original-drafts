@@ -1,1 +1,1 @@
-Most of this is licensed under the GNU GPL v2. Other code licenses are in the LICENSES folder.
+Most of this is licensed under the GNU GPL v2. Other code licenses are in the "licenses" folder.
