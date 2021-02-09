@@ -7,8 +7,8 @@
 
 // usernames and passwords
 // root users stuff
-#define rootusername "root"
-#define rootpass "Pl@7ypu505"
+char rootusername "root"
+char rootpass "Pl@7ypu505"
 // normal user's stuff
-#define normusername "you"
-#define normpass "Pl@7ypu5u53r"
+char normusername "you"
+char normpass "Pl@7ypu5u53r"
