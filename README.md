@@ -1,5 +1,5 @@
 # Platypus OS Desktop
-The desktop for Platypus OS. Because Platypus OS is a totally new thing (Ok, maybe not totally, there are some, actually, a lot of files from the Linux kernel), it has an (almost) totally new kernel, and this is the desktop OS. This is where it all goes. NOTE, ***THIS IS IN ALPHA STAGE. IF IT CRASHES, IT'S NOT MY FAULT. THANK YOU GNU PROJECT FOR PUTTING THAT IN YOUR LICENSE.*** See the file "version.txt" for what version you have. (What? All the GNU projects have it, except it's `version.h`.)
+The desktop for Platypus OS. Because Platypus OS is a totally new thing (Ok, maybe not totally, there are some, actually, a lot of files from the Linux kernel), it has an (almost) totally new kernel, and this is the desktop OS. This is where it all goes. NOTE, ***THIS IS IN ALPHA STAGE. IF YOU INSTALL IT, AND WHEN IT CRASHES, IT'S NOT MY FAULT. THANK YOU GNU PROJECT FOR PUTTING THAT IN YOUR LICENSE. THAT'S WHY I DON'T HAVE INSTRUCTIONS ON INSTALLING.*** See the file "version.txt" for what version you have. (What? All the GNU projects have it, except it's `version.h`.)
 ## How to get around/Navigation
 Note to self: needs updating BIG TIME
 ### The `.github` folder
