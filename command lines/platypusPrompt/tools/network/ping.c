@@ -1,1174 +1,1528 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+# This is a shell archive.  Remove anything before this line, then
+# unpack it by saving it in a file and typing "sh file".  (Files
+# unpacked will be owned by you and have default permissions.)
+#
+# This archive contains:
+# Makefile ping.1 ping.c ping.shar newping.1 newping.c
+
+echo x - Makefile
+cat > "Makefile" << '//E*O*F Makefile//'
+# Revised to compile under SunOS 4.1.x (no longer necessary to install
+# kernel mods).  08/07/92 RJRJr  This makefile is based on the original
+# makefiles supplied with tcpdump and traceroute.
+
+# Set DESTDIR to the directory in which the traceroute executable will be
+# installed.  /usr/etc is a good place to put a network debugging tool such
+# as this.
+
+DESTDIR= /usr/brl/sbin
+MANDIR= /usr/brl/man/man1
+
+# You shouldn't need to change anything below this line.
+CC= cc
+CFLAGS = -O
+# At the moment, the INCL variable isn't really needed for anything.
+INCL = -I.
+LIBS = 
+
+# Script (or program) that returns the machine and os types,
+# or just edit in the name yourself.
+MD=`mdtype`
+OS=`ostype`
+
+# Explicitly define compiliation rule since SunOS 4's make doesn't like gcc.
+# Also, gcc does not remove the .o before forking 'as', which can be a
+# problem if you don't own the file but can write to the directory.
+.c.o:
+  rm -f $@; $(CC) $(CFLAGS) -c $*.c
+
+all: submake
+
+ping: ping.o
+	$(CC) $(CFLAGS) $(INCL) -o ping ping.o $(LIBS)
+
+submake:
+	-@dir=$(MD)-$(OS); set -x; \
+	if [ ! -d $$dir ]; then ${MAKE} ${MFLAGS} config; fi; \
+	if [ -n "`find Makefile -newer $$dir/Makefile -print`" ]; \
+	  then ${MAKE} ${MFLAGS} config; fi; \
+	cd $$dir; ${MAKE} ${MFLAGS} ping
+
+# N.B.- symbolic links are used in the subdirectory rather than VPATH
+# because at least one Sun cc compiler puts the .o in the wrong place
+# when using VPATH and it's almost impossible to get "make depend" to
+# do the right thing.
+config: 
+	-@dir=$(MD)-$(OS); set -x; \
+	mkdir $$dir; chmod ug+w $$dir; ln -s ../ping.c $$dir; \
+	sed -e "/^all:/d" Makefile >$$dir/Makefile; \
+	chmod ug+w $$dir/Makefile; \
+	cd $$dir; ${MAKE} ${MFLAGS} depend
+install: submake FRC
+	-@dir=$(MD)-$(OS); set -x; \
+	install -c -o root -g bin -m 4755 $$dir/ping ${DESTDIR}; \
+	install -c -o root -g staff -m 664 ping.1 ${MANDIR}
+lint:
+	lint -hbxn $(INCL) ping.c | \
+	    grep -v 'possible pointer alignment problem'
+clean:
+	-@dir=$(MD)-$(OS); set -x; rm -rf $$dir
+FRC:
+depend:
+	cc -M ping.c | sed 's/\.o//' | \
+	awk ' { if ($$1 != prev) \
+		{ if (rec != "") print rec; rec = $$0; prev = $$1; } \
+		else { if (length(rec $$2) > 78) { print rec; rec = $$0; } \
+		else rec = rec " " $$2 } } \
+		END { print rec } ' >> makedep;
+	echo '/^# DO NOT DELETE THIS LINE/+2,$$d' >eddep;
+	echo '$$r makedep' >>eddep;
+	echo 'w' >>eddep;
+	cp Makefile Makefile.bak;
+	ed - Makefile < eddep;
+	rm eddep makedep;
+	echo '# DEPENDENCIES MUST END AT END OF FILE' >> Makefile;
+	echo '# IF YOU PUT STUFF HERE IT WILL GO AWAY' >> Makefile;
+	echo '# see make depend above' >> Makefile;
+
+# DO NOT DELETE THIS LINE -- make depend uses it
+
+
+
+
+//E*O*F Makefile//
+
+echo x - ping.1
+cat > "ping.1" << '//E*O*F ping.1//'
+.\" Copyright (c) 1985 Regents of the University of California.
+.\" All rights reserved.  The Berkeley software License Agreement
+.\" specifies the terms and conditions for redistribution.
+.\"
+.\"	@(#)ping.8	6.2 (Berkeley) 5/23/86
+.\"
+.TH PING 8 "May 23, 1986"
+.UC 6
+.SH NAME
+ping \- send ICMP ECHO_REQUEST packets to network hosts
+.SH SYNOPSIS
+.B /etc/ping
+[
+.B \-dfqrv
+]
+.I host
+[
+.I packetsize
+[
+.I count
+[
+.I preload
+]]]
+.SH DESCRIPTION
+The DARPA Internet is a large and complex aggregation of
+network hardware, connected together by gateways.
+Tracking a single-point hardware or software failure
+can often be difficult.
+.I Ping
+utilizes the
+ICMP protocol's mandatory ECHO_REQUEST datagram to elicit an
+ICMP ECHO_RESPONSE from a host or gateway.
+ECHO_REQUEST datagrams (``pings'') have an IP and ICMP header,
+followed by a \fBstruct timeval\fR, and then an arbitrary number
+of ``pad'' bytes used to fill out the packet.
+Default datagram length is 64 bytes, but this may be changed
+using the command-line option.
+Other options are:
+.TP
+.B \-v
+Verbose output.  ICMP packets other than ECHO RESPONSE that are received
+are listed.
+.TP
+.B \-q
+Quiet output.  Nothing is displayed except the summary line on termination.
+.TP
+.B \-f
+Flood ping.  Outputs packets as fast as they come back or one hundred times
+per second, whichever is more.  For every ECHO_REQUEST sent a period '.'
+is printed, while for ever ECHO_REPLY received a backspace is printed.
+This provides a rapid display of how many packets are being dropped.
+.TP
+.B \-r
+Bypass the normal routing tables and send directly to a host on an attached
+network.
+If the host is not on a directly-attached network,
+an error is returned.
+This option can be used to ping a local host through an interface
+that has no route through it (e.g., after the interface was dropped by
+.IR routed (8C)).
+.TP
+.B \-d
+Set the SO_DEBUG option on the socket being used.
+.PP
+When using \fIping\fR for fault isolation,
+it should first be run on the local
+host, to verify that the local network interface is up and
+running.
+Then, hosts and gateways further and further away
+should be ``pinged''.
+\fIPing\fR sends one datagram per second, and
+prints one line of output for every ECHO_RESPONSE returned.
+No output is produced if there is no response.
+If an optional
+.I count
+is given, only that number of requests is sent.
+Round-trip times and packet loss statistics are computed.
+When all responses have been received or the program times out (with a
+.I count
+specified),
+or if the program is terminated with a SIGINT, a brief
+summary is displayed.
+If
+.I preload
+is given,
+.I ping
+sends that many packets as rapidly as possible before
+falling into its normal mode of behavior.
+.PP
+This program is intended for use in network testing, measurement
+and management.
+It should be used primarily for manual fault isolation.
+Because of the load it could impose on the network,
+it is unwise to use
+.I ping
+during normal operations or from automated scripts.
+.SH DETAILS
+For those that care.  An IP header without options in 20 bytes.
+An ICMP ECHO_REQUEST packet contains an additional 8 bytes worth
+of ICMP header followed by an arbitrary amount of data.  When a
+.I packetsize
+is given, this indicated the size of this extra blob of data (the
+default is 56).  Thus the amount of data received inside of an IP
+packet of type ICMP ECHO_REPLY will always be 8 bytes more than
+the requested data space (the ICMP header).
+.PP
+If the data space is at least eight bytes large,
+.I ping
+uses the first eight bytes of this space to include a timestamp which
+it uses in the computation of round trip times.  This explains why if
+less than eight bytes of pad are requested, no round trip times are given.
+.SH BUGS
+Flood pinging the broadcast address is not recommended.
+.SH AUTHOR
+Mike Muuss
+.SH SEE ALSO
+netstat(1),
+ifconfig(8C)
+//E*O*F ping.1//
+echo x - ping.c
+cat > "ping.c" << '//E*O*F ping.c//'
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ *			P I N G . C
  *
- *		"Ping" sockets
+ * Using the InterNet Control Message Protocol (ICMP) "ECHO" facility,
+ * measure round-trip-delays and packet loss across network paths.
  *
- * Based on ipv4/udp.c code.
+ * Author -
+ *	Mike Muuss
+ *	U. S. Army Ballistic Research Laboratory
+ *	December, 1983
+ * Modified at Uc Berkeley
  *
- * Authors:	Vasiliy Kulikov / Openwall (for Linux 2.6),
- *		Pavel Kankovsky (for Linux 2.4.32)
+ * Changed argument to inet_ntoa() to be struct in_addr instead of u_long
+ * DFM BRL 1992
  *
- * Pavel gave all rights to bugs to Vasiliy,
- * none of the bugs are Pavel's now.
+ * Status -
+ *	Public Domain.  Distribution Unlimited.
+ *
+ * Bugs -
+ *	More statistics could always be gathered.
+ *	This program has to run SUID to ROOT to access the ICMP socket.
  */
-
-#include <linux/uaccess.h>
-#include <linux/types.h>
-#include <linux/fcntl.h>
-#include <linux/socket.h>
-#include <linux/sockios.h>
-#include <linux/in.h>
-#include <linux/errno.h>
-#include <linux/timer.h>
-#include <linux/mm.h>
-#include <linux/inet.h>
-#include <linux/netdevice.h>
-#include <net/snmp.h>
-#include <net/ip.h>
-#include <net/icmp.h>
-#include <net/protocol.h>
-#include <linux/skbuff.h>
-#include <linux/proc_fs.h>
-#include <linux/export.h>
-#include <net/sock.h>
-#include <net/ping.h>
-#include <net/udp.h>
-#include <net/route.h>
-#include <net/inet_common.h>
-#include <net/checksum.h>
-
-#if IS_ENABLED(CONFIG_IPV6)
-#include <linux/in6.h>
-#include <linux/icmpv6.h>
-#include <net/addrconf.h>
-#include <net/ipv6.h>
-#include <net/transp_v6.h>
+#include <stdio.h>
+#include <errno.h>
+#include <sys/time.h>
+#include <sys/param.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/file.h>
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
+#include <netdb.h>
+#define	MAXWAIT		10	/* max time to wait for response, sec. */
+#define	MAXPACKET	4096	/* max packet size */
+#define VERBOSE		1	/* verbose flag */
+#define QUIET		2	/* quiet flag */
+#define FLOOD		4	/* floodping flag */
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN	64
 #endif
-
-struct ping_table {
-	struct hlist_nulls_head	hash[PING_HTABLE_SIZE];
-	rwlock_t		lock;
-};
-
-static struct ping_table ping_table;
-struct pingv6_ops pingv6_ops;
-EXPORT_SYMBOL_GPL(pingv6_ops);
-
-static u16 ping_port_rover;
-
-static inline u32 ping_hashfn(const struct net *net, u32 num, u32 mask)
+u_char	packet[MAXPACKET];
+int	i, pingflags, options;
+extern	int errno;
+int s;			/* Socket file descriptor */
+struct hostent *hp;	/* Pointer to host info */
+struct timezone tz;	/* leftover */
+struct sockaddr whereto;/* Who to ping */
+int datalen;		/* How much data */
+char usage[] =
+"Usage:  ping [-dfqrv] host [packetsize [count [preload]]]\n";
+char *hostname;
+char hnamebuf[MAXHOSTNAMELEN];
+int npackets;
+int preload = 0;		/* number of packets to "preload" */
+int ntransmitted = 0;		/* sequence # for outbound packets = #sent */
+int ident;
+int nreceived = 0;		/* # of packets we got back */
+int timing = 0;
+int tmin = 999999999;
+int tmax = 0;
+int tsum = 0;			/* sum of all times, for doing average */
+int finish(), catcher();
+char *inet_ntoa();
+/*
+ * 			M A I N
+ */
+main(argc, argv)
+char *argv[];
 {
-	u32 res = (num + net_hash_mix(net)) & mask;
-
-	pr_debug("hash(%u) = %u\n", num, res);
-	return res;
-}
-EXPORT_SYMBOL_GPL(ping_hash);
-
-static inline struct hlist_nulls_head *ping_hashslot(struct ping_table *table,
-					     struct net *net, unsigned int num)
-{
-	return &table->hash[ping_hashfn(net, num, PING_HTABLE_MASK)];
-}
-
-int ping_get_port(struct sock *sk, unsigned short ident)
-{
-	struct hlist_nulls_node *node;
-	struct hlist_nulls_head *hlist;
-	struct inet_sock *isk, *isk2;
-	struct sock *sk2 = NULL;
-
-	isk = inet_sk(sk);
-	write_lock_bh(&ping_table.lock);
-	if (ident == 0) {
-		u32 i;
-		u16 result = ping_port_rover + 1;
-
-		for (i = 0; i < (1L << 16); i++, result++) {
-			if (!result)
-				result++; /* avoid zero */
-			hlist = ping_hashslot(&ping_table, sock_net(sk),
-					    result);
-			ping_portaddr_for_each_entry(sk2, node, hlist) {
-				isk2 = inet_sk(sk2);
-
-				if (isk2->inet_num == result)
-					goto next_port;
-			}
-
-			/* found */
-			ping_port_rover = ident = result;
-			break;
-next_port:
-			;
+	struct sockaddr_in from;
+	char **av = argv;
+	struct sockaddr_in *to = (struct sockaddr_in *) &whereto;
+	int on = 1;
+	struct protoent *proto;
+	argc--, av++;
+	while (argc > 0 && *av[0] == '-') {
+		while (*++av[0]) switch (*av[0]) {
+			case 'd':
+				options |= SO_DEBUG;
+				break;
+			case 'r':
+				options |= SO_DONTROUTE;
+				break;
+			case 'v':
+				pingflags |= VERBOSE;
+				break;
+			case 'q':
+				pingflags |= QUIET;
+				break;
+			case 'f':
+				pingflags |= FLOOD;
+				break;
 		}
-		if (i >= (1L << 16))
-			goto fail;
+		argc--, av++;
+	}
+	if(argc < 1 || argc > 4)  {
+		printf(usage);
+		exit(1);
+	}
+	bzero((char *)&whereto, sizeof(struct sockaddr) );
+	to->sin_family = AF_INET;
+	to->sin_addr.s_addr = inet_addr(av[0]);
+	if(to->sin_addr.s_addr != (unsigned)-1) {
+		strcpy(hnamebuf, av[0]);
+		hostname = hnamebuf;
 	} else {
-		hlist = ping_hashslot(&ping_table, sock_net(sk), ident);
-		ping_portaddr_for_each_entry(sk2, node, hlist) {
-			isk2 = inet_sk(sk2);
-
-			/* BUG? Why is this reuse and not reuseaddr? ping.c
-			 * doesn't turn off SO_REUSEADDR, and it doesn't expect
-			 * that other ping processes can steal its packets.
-			 */
-			if ((isk2->inet_num == ident) &&
-			    (sk2 != sk) &&
-			    (!sk2->sk_reuse || !sk->sk_reuse))
-				goto fail;
-		}
-	}
-
-	pr_debug("found port/ident = %d\n", ident);
-	isk->inet_num = ident;
-	if (sk_unhashed(sk)) {
-		pr_debug("was not hashed\n");
-		sock_hold(sk);
-		hlist_nulls_add_head(&sk->sk_nulls_node, hlist);
-		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
-	}
-	write_unlock_bh(&ping_table.lock);
-	return 0;
-
-fail:
-	write_unlock_bh(&ping_table.lock);
-	return 1;
-}
-EXPORT_SYMBOL_GPL(ping_get_port);
-
-int ping_hash(struct sock *sk)
-{
-	pr_debug("ping_hash(sk->port=%u)\n", inet_sk(sk)->inet_num);
-	BUG(); /* "Please do not press this button again." */
-
-	return 0;
-}
-
-void ping_unhash(struct sock *sk)
-{
-	struct inet_sock *isk = inet_sk(sk);
-
-	pr_debug("ping_unhash(isk=%p,isk->num=%u)\n", isk, isk->inet_num);
-	write_lock_bh(&ping_table.lock);
-	if (sk_hashed(sk)) {
-		hlist_nulls_del(&sk->sk_nulls_node);
-		sk_nulls_node_init(&sk->sk_nulls_node);
-		sock_put(sk);
-		isk->inet_num = 0;
-		isk->inet_sport = 0;
-		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-	}
-	write_unlock_bh(&ping_table.lock);
-}
-EXPORT_SYMBOL_GPL(ping_unhash);
-
-static struct sock *ping_lookup(struct net *net, struct sk_buff *skb, u16 ident)
-{
-	struct hlist_nulls_head *hslot = ping_hashslot(&ping_table, net, ident);
-	struct sock *sk = NULL;
-	struct inet_sock *isk;
-	struct hlist_nulls_node *hnode;
-	int dif = skb->dev->ifindex;
-
-	if (skb->protocol == htons(ETH_P_IP)) {
-		pr_debug("try to find: num = %d, daddr = %pI4, dif = %d\n",
-			 (int)ident, &ip_hdr(skb)->daddr, dif);
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (skb->protocol == htons(ETH_P_IPV6)) {
-		pr_debug("try to find: num = %d, daddr = %pI6c, dif = %d\n",
-			 (int)ident, &ipv6_hdr(skb)->daddr, dif);
-#endif
-	}
-
-	read_lock_bh(&ping_table.lock);
-
-	ping_portaddr_for_each_entry(sk, hnode, hslot) {
-		isk = inet_sk(sk);
-
-		pr_debug("iterate\n");
-		if (isk->inet_num != ident)
-			continue;
-
-		if (skb->protocol == htons(ETH_P_IP) &&
-		    sk->sk_family == AF_INET) {
-			pr_debug("found: %p: num=%d, daddr=%pI4, dif=%d\n", sk,
-				 (int) isk->inet_num, &isk->inet_rcv_saddr,
-				 sk->sk_bound_dev_if);
-
-			if (isk->inet_rcv_saddr &&
-			    isk->inet_rcv_saddr != ip_hdr(skb)->daddr)
-				continue;
-#if IS_ENABLED(CONFIG_IPV6)
-		} else if (skb->protocol == htons(ETH_P_IPV6) &&
-			   sk->sk_family == AF_INET6) {
-
-			pr_debug("found: %p: num=%d, daddr=%pI6c, dif=%d\n", sk,
-				 (int) isk->inet_num,
-				 &sk->sk_v6_rcv_saddr,
-				 sk->sk_bound_dev_if);
-
-			if (!ipv6_addr_any(&sk->sk_v6_rcv_saddr) &&
-			    !ipv6_addr_equal(&sk->sk_v6_rcv_saddr,
-					     &ipv6_hdr(skb)->daddr))
-				continue;
-#endif
+		hp = gethostbyname(av[0]);
+		if (hp) {
+			to->sin_family = hp->h_addrtype;
+			bcopy(hp->h_addr, (caddr_t)&to->sin_addr, hp->h_length);
+			hostname = hp->h_name;
 		} else {
-			continue;
-		}
-
-		if (sk->sk_bound_dev_if && sk->sk_bound_dev_if != dif)
-			continue;
-
-		sock_hold(sk);
-		goto exit;
-	}
-
-	sk = NULL;
-exit:
-	read_unlock_bh(&ping_table.lock);
-
-	return sk;
-}
-
-static void inet_get_ping_group_range_net(struct net *net, kgid_t *low,
-					  kgid_t *high)
-{
-	kgid_t *data = net->ipv4.ping_group_range.range;
-	unsigned int seq;
-
-	do {
-		seq = read_seqbegin(&net->ipv4.ping_group_range.lock);
-
-		*low = data[0];
-		*high = data[1];
-	} while (read_seqretry(&net->ipv4.ping_group_range.lock, seq));
-}
-
-
-int ping_init_sock(struct sock *sk)
-{
-	struct net *net = sock_net(sk);
-	kgid_t group = current_egid();
-	struct group_info *group_info;
-	int i;
-	kgid_t low, high;
-	int ret = 0;
-
-	if (sk->sk_family == AF_INET6)
-		sk->sk_ipv6only = 1;
-
-	inet_get_ping_group_range_net(net, &low, &high);
-	if (gid_lte(low, group) && gid_lte(group, high))
-		return 0;
-
-	group_info = get_current_groups();
-	for (i = 0; i < group_info->ngroups; i++) {
-		kgid_t gid = group_info->gid[i];
-
-		if (gid_lte(low, gid) && gid_lte(gid, high))
-			goto out_release_group;
-	}
-
-	ret = -EACCES;
-
-out_release_group:
-	put_group_info(group_info);
-	return ret;
-}
-EXPORT_SYMBOL_GPL(ping_init_sock);
-
-void ping_close(struct sock *sk, long timeout)
-{
-	pr_debug("ping_close(sk=%p,sk->num=%u)\n",
-		 inet_sk(sk), inet_sk(sk)->inet_num);
-	pr_debug("isk->refcnt = %d\n", refcount_read(&sk->sk_refcnt));
-
-	sk_common_release(sk);
-}
-EXPORT_SYMBOL_GPL(ping_close);
-
-/* Checks the bind address and possibly modifies sk->sk_bound_dev_if. */
-static int ping_check_bind_addr(struct sock *sk, struct inet_sock *isk,
-				struct sockaddr *uaddr, int addr_len)
-{
-	struct net *net = sock_net(sk);
-	if (sk->sk_family == AF_INET) {
-		struct sockaddr_in *addr = (struct sockaddr_in *) uaddr;
-		int chk_addr_ret;
-
-		if (addr_len < sizeof(*addr))
-			return -EINVAL;
-
-		if (addr->sin_family != AF_INET &&
-		    !(addr->sin_family == AF_UNSPEC &&
-		      addr->sin_addr.s_addr == htonl(INADDR_ANY)))
-			return -EAFNOSUPPORT;
-
-		pr_debug("ping_check_bind_addr(sk=%p,addr=%pI4,port=%d)\n",
-			 sk, &addr->sin_addr.s_addr, ntohs(addr->sin_port));
-
-		if (addr->sin_addr.s_addr == htonl(INADDR_ANY))
-			chk_addr_ret = RTN_LOCAL;
-		else
-			chk_addr_ret = inet_addr_type(net, addr->sin_addr.s_addr);
-
-		if ((!inet_can_nonlocal_bind(net, isk) &&
-		     chk_addr_ret != RTN_LOCAL) ||
-		    chk_addr_ret == RTN_MULTICAST ||
-		    chk_addr_ret == RTN_BROADCAST)
-			return -EADDRNOTAVAIL;
-
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (sk->sk_family == AF_INET6) {
-		struct sockaddr_in6 *addr = (struct sockaddr_in6 *) uaddr;
-		int addr_type, scoped, has_addr;
-		struct net_device *dev = NULL;
-
-		if (addr_len < sizeof(*addr))
-			return -EINVAL;
-
-		if (addr->sin6_family != AF_INET6)
-			return -EAFNOSUPPORT;
-
-		pr_debug("ping_check_bind_addr(sk=%p,addr=%pI6c,port=%d)\n",
-			 sk, addr->sin6_addr.s6_addr, ntohs(addr->sin6_port));
-
-		addr_type = ipv6_addr_type(&addr->sin6_addr);
-		scoped = __ipv6_addr_needs_scope_id(addr_type);
-		if ((addr_type != IPV6_ADDR_ANY &&
-		     !(addr_type & IPV6_ADDR_UNICAST)) ||
-		    (scoped && !addr->sin6_scope_id))
-			return -EINVAL;
-
-		rcu_read_lock();
-		if (addr->sin6_scope_id) {
-			dev = dev_get_by_index_rcu(net, addr->sin6_scope_id);
-			if (!dev) {
-				rcu_read_unlock();
-				return -ENODEV;
-			}
-		}
-		has_addr = pingv6_ops.ipv6_chk_addr(net, &addr->sin6_addr, dev,
-						    scoped);
-		rcu_read_unlock();
-
-		if (!(ipv6_can_nonlocal_bind(net, isk) || has_addr ||
-		      addr_type == IPV6_ADDR_ANY))
-			return -EADDRNOTAVAIL;
-
-		if (scoped)
-			sk->sk_bound_dev_if = addr->sin6_scope_id;
-#endif
-	} else {
-		return -EAFNOSUPPORT;
-	}
-	return 0;
-}
-
-static void ping_set_saddr(struct sock *sk, struct sockaddr *saddr)
-{
-	if (saddr->sa_family == AF_INET) {
-		struct inet_sock *isk = inet_sk(sk);
-		struct sockaddr_in *addr = (struct sockaddr_in *) saddr;
-		isk->inet_rcv_saddr = isk->inet_saddr = addr->sin_addr.s_addr;
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (saddr->sa_family == AF_INET6) {
-		struct sockaddr_in6 *addr = (struct sockaddr_in6 *) saddr;
-		struct ipv6_pinfo *np = inet6_sk(sk);
-		sk->sk_v6_rcv_saddr = np->saddr = addr->sin6_addr;
-#endif
-	}
-}
-
-/*
- * We need our own bind because there are no privileged id's == local ports.
- * Moreover, we don't allow binding to multi- and broadcast addresses.
- */
-
-int ping_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
-{
-	struct inet_sock *isk = inet_sk(sk);
-	unsigned short snum;
-	int err;
-	int dif = sk->sk_bound_dev_if;
-
-	err = ping_check_bind_addr(sk, isk, uaddr, addr_len);
-	if (err)
-		return err;
-
-	lock_sock(sk);
-
-	err = -EINVAL;
-	if (isk->inet_num != 0)
-		goto out;
-
-	err = -EADDRINUSE;
-	snum = ntohs(((struct sockaddr_in *)uaddr)->sin_port);
-	if (ping_get_port(sk, snum) != 0) {
-		/* Restore possibly modified sk->sk_bound_dev_if by ping_check_bind_addr(). */
-		sk->sk_bound_dev_if = dif;
-		goto out;
-	}
-	ping_set_saddr(sk, uaddr);
-
-	pr_debug("after bind(): num = %hu, dif = %d\n",
-		 isk->inet_num,
-		 sk->sk_bound_dev_if);
-
-	err = 0;
-	if (sk->sk_family == AF_INET && isk->inet_rcv_saddr)
-		sk->sk_userlocks |= SOCK_BINDADDR_LOCK;
-#if IS_ENABLED(CONFIG_IPV6)
-	if (sk->sk_family == AF_INET6 && !ipv6_addr_any(&sk->sk_v6_rcv_saddr))
-		sk->sk_userlocks |= SOCK_BINDADDR_LOCK;
-#endif
-
-	if (snum)
-		sk->sk_userlocks |= SOCK_BINDPORT_LOCK;
-	isk->inet_sport = htons(isk->inet_num);
-	isk->inet_daddr = 0;
-	isk->inet_dport = 0;
-
-#if IS_ENABLED(CONFIG_IPV6)
-	if (sk->sk_family == AF_INET6)
-		memset(&sk->sk_v6_daddr, 0, sizeof(sk->sk_v6_daddr));
-#endif
-
-	sk_dst_reset(sk);
-out:
-	release_sock(sk);
-	pr_debug("ping_v4_bind -> %d\n", err);
-	return err;
-}
-EXPORT_SYMBOL_GPL(ping_bind);
-
-/*
- * Is this a supported type of ICMP message?
- */
-
-static inline int ping_supported(int family, int type, int code)
-{
-	return (family == AF_INET && type == ICMP_ECHO && code == 0) ||
-	       (family == AF_INET6 && type == ICMPV6_ECHO_REQUEST && code == 0);
-}
-
-/*
- * This routine is called by the ICMP module when it gets some
- * sort of error condition.
- */
-
-void ping_err(struct sk_buff *skb, int offset, u32 info)
-{
-	int family;
-	struct icmphdr *icmph;
-	struct inet_sock *inet_sock;
-	int type;
-	int code;
-	struct net *net = dev_net(skb->dev);
-	struct sock *sk;
-	int harderr;
-	int err;
-
-	if (skb->protocol == htons(ETH_P_IP)) {
-		family = AF_INET;
-		type = icmp_hdr(skb)->type;
-		code = icmp_hdr(skb)->code;
-		icmph = (struct icmphdr *)(skb->data + offset);
-	} else if (skb->protocol == htons(ETH_P_IPV6)) {
-		family = AF_INET6;
-		type = icmp6_hdr(skb)->icmp6_type;
-		code = icmp6_hdr(skb)->icmp6_code;
-		icmph = (struct icmphdr *) (skb->data + offset);
-	} else {
-		BUG();
-	}
-
-	/* We assume the packet has already been checked by icmp_unreach */
-
-	if (!ping_supported(family, icmph->type, icmph->code))
-		return;
-
-	pr_debug("ping_err(proto=0x%x,type=%d,code=%d,id=%04x,seq=%04x)\n",
-		 skb->protocol, type, code, ntohs(icmph->un.echo.id),
-		 ntohs(icmph->un.echo.sequence));
-
-	sk = ping_lookup(net, skb, ntohs(icmph->un.echo.id));
-	if (!sk) {
-		pr_debug("no socket, dropping\n");
-		return;	/* No socket for error */
-	}
-	pr_debug("err on socket %p\n", sk);
-
-	err = 0;
-	harderr = 0;
-	inet_sock = inet_sk(sk);
-
-	if (skb->protocol == htons(ETH_P_IP)) {
-		switch (type) {
-		default:
-		case ICMP_TIME_EXCEEDED:
-			err = EHOSTUNREACH;
-			break;
-		case ICMP_SOURCE_QUENCH:
-			/* This is not a real error but ping wants to see it.
-			 * Report it with some fake errno.
-			 */
-			err = EREMOTEIO;
-			break;
-		case ICMP_PARAMETERPROB:
-			err = EPROTO;
-			harderr = 1;
-			break;
-		case ICMP_DEST_UNREACH:
-			if (code == ICMP_FRAG_NEEDED) { /* Path MTU discovery */
-				ipv4_sk_update_pmtu(skb, sk, info);
-				if (inet_sock->pmtudisc != IP_PMTUDISC_DONT) {
-					err = EMSGSIZE;
-					harderr = 1;
-					break;
-				}
-				goto out;
-			}
-			err = EHOSTUNREACH;
-			if (code <= NR_ICMP_UNREACH) {
-				harderr = icmp_err_convert[code].fatal;
-				err = icmp_err_convert[code].errno;
-			}
-			break;
-		case ICMP_REDIRECT:
-			/* See ICMP_SOURCE_QUENCH */
-			ipv4_sk_redirect(skb, sk);
-			err = EREMOTEIO;
-			break;
-		}
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (skb->protocol == htons(ETH_P_IPV6)) {
-		harderr = pingv6_ops.icmpv6_err_convert(type, code, &err);
-#endif
-	}
-
-	/*
-	 *      RFC1122: OK.  Passes ICMP errors back to application, as per
-	 *	4.1.3.3.
-	 */
-	if ((family == AF_INET && !inet_sock->recverr) ||
-	    (family == AF_INET6 && !inet6_sk(sk)->recverr)) {
-		if (!harderr || sk->sk_state != TCP_ESTABLISHED)
-			goto out;
-	} else {
-		if (family == AF_INET) {
-			ip_icmp_error(sk, skb, err, 0 /* no remote port */,
-				      info, (u8 *)icmph);
-#if IS_ENABLED(CONFIG_IPV6)
-		} else if (family == AF_INET6) {
-			pingv6_ops.ipv6_icmp_error(sk, skb, err, 0,
-						   info, (u8 *)icmph);
-#endif
+			printf("%s: unknown host %s\n", argv[0], av[0]);
+			exit(1);
 		}
 	}
-	sk->sk_err = err;
-	sk->sk_error_report(sk);
-out:
-	sock_put(sk);
-}
-EXPORT_SYMBOL_GPL(ping_err);
-
-/*
- *	Copy and checksum an ICMP Echo packet from user space into a buffer
- *	starting from the payload.
- */
-
-int ping_getfrag(void *from, char *to,
-		 int offset, int fraglen, int odd, struct sk_buff *skb)
-{
-	struct pingfakehdr *pfh = (struct pingfakehdr *)from;
-
-	if (offset == 0) {
-		fraglen -= sizeof(struct icmphdr);
-		if (fraglen < 0)
-			BUG();
-		if (!csum_and_copy_from_iter_full(to + sizeof(struct icmphdr),
-			    fraglen, &pfh->wcheck,
-			    &pfh->msg->msg_iter))
-			return -EFAULT;
-	} else if (offset < sizeof(struct icmphdr)) {
-			BUG();
-	} else {
-		if (!csum_and_copy_from_iter_full(to, fraglen, &pfh->wcheck,
-					    &pfh->msg->msg_iter))
-			return -EFAULT;
-	}
-
-#if IS_ENABLED(CONFIG_IPV6)
-	/* For IPv6, checksum each skb as we go along, as expected by
-	 * icmpv6_push_pending_frames. For IPv4, accumulate the checksum in
-	 * wcheck, it will be finalized in ping_v4_push_pending_frames.
-	 */
-	if (pfh->family == AF_INET6) {
-		skb->csum = pfh->wcheck;
-		skb->ip_summed = CHECKSUM_NONE;
-		pfh->wcheck = 0;
-	}
-#endif
-
-	return 0;
-}
-EXPORT_SYMBOL_GPL(ping_getfrag);
-
-static int ping_v4_push_pending_frames(struct sock *sk, struct pingfakehdr *pfh,
-				       struct flowi4 *fl4)
-{
-	struct sk_buff *skb = skb_peek(&sk->sk_write_queue);
-
-	if (!skb)
-		return 0;
-	pfh->wcheck = csum_partial((char *)&pfh->icmph,
-		sizeof(struct icmphdr), pfh->wcheck);
-	pfh->icmph.checksum = csum_fold(pfh->wcheck);
-	memcpy(icmp_hdr(skb), &pfh->icmph, sizeof(struct icmphdr));
-	skb->ip_summed = CHECKSUM_NONE;
-	return ip_push_pending_frames(sk, fl4);
-}
-
-int ping_common_sendmsg(int family, struct msghdr *msg, size_t len,
-			void *user_icmph, size_t icmph_len)
-{
-	u8 type, code;
-
-	if (len > 0xFFFF)
-		return -EMSGSIZE;
-
-	/* Must have at least a full ICMP header. */
-	if (len < icmph_len)
-		return -EINVAL;
-
-	/*
-	 *	Check the flags.
-	 */
-
-	/* Mirror BSD error message compatibility */
-	if (msg->msg_flags & MSG_OOB)
-		return -EOPNOTSUPP;
-
-	/*
-	 *	Fetch the ICMP header provided by the userland.
-	 *	iovec is modified! The ICMP header is consumed.
-	 */
-	if (memcpy_from_msg(user_icmph, msg, icmph_len))
-		return -EFAULT;
-
-	if (family == AF_INET) {
-		type = ((struct icmphdr *) user_icmph)->type;
-		code = ((struct icmphdr *) user_icmph)->code;
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (family == AF_INET6) {
-		type = ((struct icmp6hdr *) user_icmph)->icmp6_type;
-		code = ((struct icmp6hdr *) user_icmph)->icmp6_code;
-#endif
-	} else {
-		BUG();
-	}
-
-	if (!ping_supported(family, type, code))
-		return -EINVAL;
-
-	return 0;
-}
-EXPORT_SYMBOL_GPL(ping_common_sendmsg);
-
-static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
-{
-	struct net *net = sock_net(sk);
-	struct flowi4 fl4;
-	struct inet_sock *inet = inet_sk(sk);
-	struct ipcm_cookie ipc;
-	struct icmphdr user_icmph;
-	struct pingfakehdr pfh;
-	struct rtable *rt = NULL;
-	struct ip_options_data opt_copy;
-	int free = 0;
-	__be32 saddr, daddr, faddr;
-	u8  tos;
-	int err;
-
-	pr_debug("ping_v4_sendmsg(sk=%p,sk->num=%u)\n", inet, inet->inet_num);
-
-	err = ping_common_sendmsg(AF_INET, msg, len, &user_icmph,
-				  sizeof(user_icmph));
-	if (err)
-		return err;
-
-	/*
-	 *	Get and verify the address.
-	 */
-
-	if (msg->msg_name) {
-		DECLARE_SOCKADDR(struct sockaddr_in *, usin, msg->msg_name);
-		if (msg->msg_namelen < sizeof(*usin))
-			return -EINVAL;
-		if (usin->sin_family != AF_INET)
-			return -EAFNOSUPPORT;
-		daddr = usin->sin_addr.s_addr;
-		/* no remote port */
-	} else {
-		if (sk->sk_state != TCP_ESTABLISHED)
-			return -EDESTADDRREQ;
-		daddr = inet->inet_daddr;
-		/* no remote port */
-	}
-
-	ipcm_init_sk(&ipc, inet);
-
-	if (msg->msg_controllen) {
-		err = ip_cmsg_send(sk, msg, &ipc, false);
-		if (unlikely(err)) {
-			kfree(ipc.opt);
-			return err;
-		}
-		if (ipc.opt)
-			free = 1;
-	}
-	if (!ipc.opt) {
-		struct ip_options_rcu *inet_opt;
-
-		rcu_read_lock();
-		inet_opt = rcu_dereference(inet->inet_opt);
-		if (inet_opt) {
-			memcpy(&opt_copy, inet_opt,
-			       sizeof(*inet_opt) + inet_opt->opt.optlen);
-			ipc.opt = &opt_copy.opt;
-		}
-		rcu_read_unlock();
-	}
-
-	saddr = ipc.addr;
-	ipc.addr = faddr = daddr;
-
-	if (ipc.opt && ipc.opt->opt.srr) {
-		if (!daddr) {
-			err = -EINVAL;
-			goto out_free;
-		}
-		faddr = ipc.opt->opt.faddr;
-	}
-	tos = get_rttos(&ipc, inet);
-	if (sock_flag(sk, SOCK_LOCALROUTE) ||
-	    (msg->msg_flags & MSG_DONTROUTE) ||
-	    (ipc.opt && ipc.opt->opt.is_strictroute)) {
-		tos |= RTO_ONLINK;
-	}
-
-	if (ipv4_is_multicast(daddr)) {
-		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
-			ipc.oif = inet->mc_index;
-		if (!saddr)
-			saddr = inet->mc_addr;
-	} else if (!ipc.oif)
-		ipc.oif = inet->uc_index;
-
-	flowi4_init_output(&fl4, ipc.oif, ipc.sockc.mark, tos,
-			   RT_SCOPE_UNIVERSE, sk->sk_protocol,
-			   inet_sk_flowi_flags(sk), faddr, saddr, 0, 0,
-			   sk->sk_uid);
-
-	fl4.fl4_icmp_type = user_icmph.type;
-	fl4.fl4_icmp_code = user_icmph.code;
-
-	security_sk_classify_flow(sk, flowi4_to_flowi(&fl4));
-	rt = ip_route_output_flow(net, &fl4, sk);
-	if (IS_ERR(rt)) {
-		err = PTR_ERR(rt);
-		rt = NULL;
-		if (err == -ENETUNREACH)
-			IP_INC_STATS(net, IPSTATS_MIB_OUTNOROUTES);
-		goto out;
-	}
-
-	err = -EACCES;
-	if ((rt->rt_flags & RTCF_BROADCAST) &&
-	    !sock_flag(sk, SOCK_BROADCAST))
-		goto out;
-
-	if (msg->msg_flags & MSG_CONFIRM)
-		goto do_confirm;
-back_from_confirm:
-
-	if (!ipc.addr)
-		ipc.addr = fl4.daddr;
-
-	lock_sock(sk);
-
-	pfh.icmph.type = user_icmph.type; /* already checked */
-	pfh.icmph.code = user_icmph.code; /* ditto */
-	pfh.icmph.checksum = 0;
-	pfh.icmph.un.echo.id = inet->inet_sport;
-	pfh.icmph.un.echo.sequence = user_icmph.un.echo.sequence;
-	pfh.msg = msg;
-	pfh.wcheck = 0;
-	pfh.family = AF_INET;
-
-	err = ip_append_data(sk, &fl4, ping_getfrag, &pfh, len,
-			0, &ipc, &rt, msg->msg_flags);
-	if (err)
-		ip_flush_pending_frames(sk);
+	if( argc >= 2 )
+		datalen = atoi( av[1] );
 	else
-		err = ping_v4_push_pending_frames(sk, &pfh, &fl4);
-	release_sock(sk);
-
-out:
-	ip_rt_put(rt);
-out_free:
-	if (free)
-		kfree(ipc.opt);
-	if (!err) {
-		icmp_out_count(sock_net(sk), user_icmph.type);
-		return len;
+		datalen = 64-8;
+	if (datalen > MAXPACKET) {
+		fprintf(stderr, "ping: packet size too large\n");
+		exit(1);
 	}
-	return err;
-
-do_confirm:
-	if (msg->msg_flags & MSG_PROBE)
-		dst_confirm_neigh(&rt->dst, &fl4.daddr);
-	if (!(msg->msg_flags & MSG_PROBE) || len)
-		goto back_from_confirm;
-	err = 0;
-	goto out;
-}
-
-int ping_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int noblock,
-		 int flags, int *addr_len)
-{
-	struct inet_sock *isk = inet_sk(sk);
-	int family = sk->sk_family;
-	struct sk_buff *skb;
-	int copied, err;
-
-	pr_debug("ping_recvmsg(sk=%p,sk->num=%u)\n", isk, isk->inet_num);
-
-	err = -EOPNOTSUPP;
-	if (flags & MSG_OOB)
-		goto out;
-
-	if (flags & MSG_ERRQUEUE)
-		return inet_recv_error(sk, msg, len, addr_len);
-
-	skb = skb_recv_datagram(sk, flags, noblock, &err);
-	if (!skb)
-		goto out;
-
-	copied = skb->len;
-	if (copied > len) {
-		msg->msg_flags |= MSG_TRUNC;
-		copied = len;
+	if (datalen >= sizeof(struct timeval))	/* can we time 'em? */
+		timing = 1;
+	if (argc >= 3)
+		npackets = atoi(av[2]);
+	if (argc == 4)
+		preload = atoi(av[3]);
+	ident = getpid() & 0xFFFF;
+	if ((proto = getprotobyname("icmp")) == NULL) {
+		fprintf(stderr, "icmp: unknown protocol\n");
+		exit(10);
 	}
-
-	/* Don't bother checking the checksum */
-	err = skb_copy_datagram_msg(skb, 0, msg, copied);
-	if (err)
-		goto done;
-
-	sock_recv_timestamp(msg, sk, skb);
-
-	/* Copy the address and add cmsg data. */
-	if (family == AF_INET) {
-		DECLARE_SOCKADDR(struct sockaddr_in *, sin, msg->msg_name);
-
-		if (sin) {
-			sin->sin_family = AF_INET;
-			sin->sin_port = 0 /* skb->h.uh->source */;
-			sin->sin_addr.s_addr = ip_hdr(skb)->saddr;
-			memset(sin->sin_zero, 0, sizeof(sin->sin_zero));
-			*addr_len = sizeof(*sin);
-		}
-
-		if (isk->cmsg_flags)
-			ip_cmsg_recv(msg, skb);
-
-#if IS_ENABLED(CONFIG_IPV6)
-	} else if (family == AF_INET6) {
-		struct ipv6_pinfo *np = inet6_sk(sk);
-		struct ipv6hdr *ip6 = ipv6_hdr(skb);
-		DECLARE_SOCKADDR(struct sockaddr_in6 *, sin6, msg->msg_name);
-
-		if (sin6) {
-			sin6->sin6_family = AF_INET6;
-			sin6->sin6_port = 0;
-			sin6->sin6_addr = ip6->saddr;
-			sin6->sin6_flowinfo = 0;
-			if (np->sndflow)
-				sin6->sin6_flowinfo = ip6_flowinfo(ip6);
-			sin6->sin6_scope_id =
-				ipv6_iface_scope_id(&sin6->sin6_addr,
-						    inet6_iif(skb));
-			*addr_len = sizeof(*sin6);
-		}
-
-		if (inet6_sk(sk)->rxopt.all)
-			pingv6_ops.ip6_datagram_recv_common_ctl(sk, msg, skb);
-		if (skb->protocol == htons(ETH_P_IPV6) &&
-		    inet6_sk(sk)->rxopt.all)
-			pingv6_ops.ip6_datagram_recv_specific_ctl(sk, msg, skb);
-		else if (skb->protocol == htons(ETH_P_IP) && isk->cmsg_flags)
-			ip_cmsg_recv(msg, skb);
-#endif
+	if ((s = socket(AF_INET, SOCK_RAW, proto->p_proto)) < 0) {
+		perror("ping: socket");
+		exit(5);
+	}
+	if (options & SO_DEBUG) {
+		if(pingflags & VERBOSE)
+			printf("...debug on.\n");
+		setsockopt(s, SOL_SOCKET, SO_DEBUG, &on, sizeof(on));
+	}
+	if (options & SO_DONTROUTE) {
+		if(pingflags & VERBOSE)
+			printf("...no routing.\n");
+		setsockopt(s, SOL_SOCKET, SO_DONTROUTE, &on, sizeof(on));
+	}
+	if(to->sin_family == AF_INET) {
+		printf("PING %s (%s): %d data bytes\n", hostname,
+		  inet_ntoa(to->sin_addr), datalen);	/* DFM */
 	} else {
-		BUG();
+		printf("PING %s: %d data bytes\n", hostname, datalen );
 	}
-
-	err = copied;
-
-done:
-	skb_free_datagram(sk, skb);
-out:
-	pr_debug("ping_recvmsg -> %d\n", err);
-	return err;
-}
-EXPORT_SYMBOL_GPL(ping_recvmsg);
-
-int ping_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
-{
-	pr_debug("ping_queue_rcv_skb(sk=%p,sk->num=%d,skb=%p)\n",
-		 inet_sk(sk), inet_sk(sk)->inet_num, skb);
-	if (sock_queue_rcv_skb(sk, skb) < 0) {
-		kfree_skb(skb);
-		pr_debug("ping_queue_rcv_skb -> failed\n");
-		return -1;
-	}
-	return 0;
-}
-EXPORT_SYMBOL_GPL(ping_queue_rcv_skb);
-
-
-/*
- *	All we need to do is get the socket.
- */
-
-bool ping_rcv(struct sk_buff *skb)
-{
-	struct sock *sk;
-	struct net *net = dev_net(skb->dev);
-	struct icmphdr *icmph = icmp_hdr(skb);
-
-	/* We assume the packet has already been checked by icmp_rcv */
-
-	pr_debug("ping_rcv(skb=%p,id=%04x,seq=%04x)\n",
-		 skb, ntohs(icmph->un.echo.id), ntohs(icmph->un.echo.sequence));
-
-	/* Push ICMP header back */
-	skb_push(skb, skb->data - (u8 *)icmph);
-
-	sk = ping_lookup(net, skb, ntohs(icmph->un.echo.id));
-	if (sk) {
-		struct sk_buff *skb2 = skb_clone(skb, GFP_ATOMIC);
-
-		pr_debug("rcv on socket %p\n", sk);
-		if (skb2)
-			ping_queue_rcv_skb(sk, skb2);
-		sock_put(sk);
-		return true;
-	}
-	pr_debug("no socket, dropping\n");
-
-	return false;
-}
-EXPORT_SYMBOL_GPL(ping_rcv);
-
-struct proto ping_prot = {
-	.name =		"PING",
-	.owner =	THIS_MODULE,
-	.init =		ping_init_sock,
-	.close =	ping_close,
-	.connect =	ip4_datagram_connect,
-	.disconnect =	__udp_disconnect,
-	.setsockopt =	ip_setsockopt,
-	.getsockopt =	ip_getsockopt,
-	.sendmsg =	ping_v4_sendmsg,
-	.recvmsg =	ping_recvmsg,
-	.bind =		ping_bind,
-	.backlog_rcv =	ping_queue_rcv_skb,
-	.release_cb =	ip4_datagram_release_cb,
-	.hash =		ping_hash,
-	.unhash =	ping_unhash,
-	.get_port =	ping_get_port,
-	.obj_size =	sizeof(struct inet_sock),
-};
-EXPORT_SYMBOL(ping_prot);
-
-#ifdef CONFIG_PROC_FS
-
-static struct sock *ping_get_first(struct seq_file *seq, int start)
-{
-	struct sock *sk;
-	struct ping_iter_state *state = seq->private;
-	struct net *net = seq_file_net(seq);
-
-	for (state->bucket = start; state->bucket < PING_HTABLE_SIZE;
-	     ++state->bucket) {
-		struct hlist_nulls_node *node;
-		struct hlist_nulls_head *hslot;
-
-		hslot = &ping_table.hash[state->bucket];
-
-		if (hlist_nulls_empty(hslot))
-			continue;
-
-		sk_nulls_for_each(sk, node, hslot) {
-			if (net_eq(sock_net(sk), net) &&
-			    sk->sk_family == state->family)
-				goto found;
+	setlinebuf( stdout );
+	signal( SIGINT, finish );
+	signal(SIGALRM, catcher);
+	/* fire off them quickies */
+	for(i=0; i < preload; i++)
+		pinger();
+	if(!(pingflags & FLOOD))
+		catcher();	/* start things going */
+	for (;;) {
+		int len = sizeof (packet);
+		int fromlen = sizeof (from);
+		int cc;
+		struct timeval timeout;
+		int fdmask = 1 << s;
+		timeout.tv_sec = 0;
+		timeout.tv_usec = 10000;
+		if(pingflags & FLOOD) {
+			pinger();
+			if( select(32, &fdmask, 0, 0, &timeout) == 0)
+				continue;
 		}
+		if ( (cc=recvfrom(s, packet, len, 0, &from, &fromlen)) < 0) {
+			if( errno == EINTR )
+				continue;
+			perror("ping: recvfrom");
+			continue;
+		}
+		pr_pack( packet, cc, &from );
+		if (npackets && nreceived >= npackets)
+			finish();
 	}
-	sk = NULL;
-found:
-	return sk;
+	/*NOTREACHED*/
 }
-
-static struct sock *ping_get_next(struct seq_file *seq, struct sock *sk)
+/*
+ * 			C A T C H E R
+ * 
+ * This routine causes another PING to be transmitted, and then
+ * schedules another SIGALRM for 1 second from now.
+ * 
+ * Bug -
+ * 	Our sense of time will slowly skew (ie, packets will not be launched
+ * 	exactly at 1-second intervals).  This does not affect the quality
+ *	of the delay and loss statistics.
+ */
+catcher()
 {
-	struct ping_iter_state *state = seq->private;
-	struct net *net = seq_file_net(seq);
-
-	do {
-		sk = sk_nulls_next(sk);
-	} while (sk && (!net_eq(sock_net(sk), net)));
-
-	if (!sk)
-		return ping_get_first(seq, state->bucket + 1);
-	return sk;
-}
-
-static struct sock *ping_get_idx(struct seq_file *seq, loff_t pos)
-{
-	struct sock *sk = ping_get_first(seq, 0);
-
-	if (sk)
-		while (pos && (sk = ping_get_next(seq, sk)) != NULL)
-			--pos;
-	return pos ? NULL : sk;
-}
-
-void *ping_seq_start(struct seq_file *seq, loff_t *pos, sa_family_t family)
-	__acquires(ping_table.lock)
-{
-	struct ping_iter_state *state = seq->private;
-	state->bucket = 0;
-	state->family = family;
-
-	read_lock_bh(&ping_table.lock);
-
-	return *pos ? ping_get_idx(seq, *pos-1) : SEQ_START_TOKEN;
-}
-EXPORT_SYMBOL_GPL(ping_seq_start);
-
-static void *ping_v4_seq_start(struct seq_file *seq, loff_t *pos)
-{
-	return ping_seq_start(seq, pos, AF_INET);
-}
-
-void *ping_seq_next(struct seq_file *seq, void *v, loff_t *pos)
-{
-	struct sock *sk;
-
-	if (v == SEQ_START_TOKEN)
-		sk = ping_get_idx(seq, 0);
-	else
-		sk = ping_get_next(seq, v);
-
-	++*pos;
-	return sk;
-}
-EXPORT_SYMBOL_GPL(ping_seq_next);
-
-void ping_seq_stop(struct seq_file *seq, void *v)
-	__releases(ping_table.lock)
-{
-	read_unlock_bh(&ping_table.lock);
-}
-EXPORT_SYMBOL_GPL(ping_seq_stop);
-
-static void ping_v4_format_sock(struct sock *sp, struct seq_file *f,
-		int bucket)
-{
-	struct inet_sock *inet = inet_sk(sp);
-	__be32 dest = inet->inet_daddr;
-	__be32 src = inet->inet_rcv_saddr;
-	__u16 destp = ntohs(inet->inet_dport);
-	__u16 srcp = ntohs(inet->inet_sport);
-
-	seq_printf(f, "%5d: %08X:%04X %08X:%04X"
-		" %02X %08X:%08X %02X:%08lX %08X %5u %8d %lu %d %pK %u",
-		bucket, src, srcp, dest, destp, sp->sk_state,
-		sk_wmem_alloc_get(sp),
-		sk_rmem_alloc_get(sp),
-		0, 0L, 0,
-		from_kuid_munged(seq_user_ns(f), sock_i_uid(sp)),
-		0, sock_i_ino(sp),
-		refcount_read(&sp->sk_refcnt), sp,
-		atomic_read(&sp->sk_drops));
-}
-
-static int ping_v4_seq_show(struct seq_file *seq, void *v)
-{
-	seq_setwidth(seq, 127);
-	if (v == SEQ_START_TOKEN)
-		seq_puts(seq, "  sl  local_address rem_address   st tx_queue "
-			   "rx_queue tr tm->when retrnsmt   uid  timeout "
-			   "inode ref pointer drops");
+	int waittime;
+	pinger();
+	if (npackets == 0 || ntransmitted < npackets)
+		alarm(1);
 	else {
-		struct ping_iter_state *state = seq->private;
-
-		ping_v4_format_sock(v, seq, state->bucket);
+		if (nreceived) {
+			waittime = 2 * tmax / 1000;
+			if (waittime == 0)
+				waittime = 1;
+		} else
+			waittime = MAXWAIT;
+		signal(SIGALRM, finish);
+		alarm(waittime);
 	}
-	seq_pad(seq, '\n');
-	return 0;
 }
-
-static const struct seq_operations ping_v4_seq_ops = {
-	.start		= ping_v4_seq_start,
-	.show		= ping_v4_seq_show,
-	.next		= ping_seq_next,
-	.stop		= ping_seq_stop,
-};
-
-static int __net_init ping_v4_proc_init_net(struct net *net)
+/*
+ * 			P I N G E R
+ * 
+ * Compose and transmit an ICMP ECHO REQUEST packet.  The IP packet
+ * will be added on by the kernel.  The ID field is our UNIX process ID,
+ * and the sequence number is an ascending integer.  The first 8 bytes
+ * of the data portion are used to hold a UNIX "timeval" struct in VAX
+ * byte-order, to compute the round-trip time.
+ */
+pinger()
 {
-	if (!proc_create_net("icmp", 0444, net->proc_net, &ping_v4_seq_ops,
-			sizeof(struct ping_iter_state)))
-		return -ENOMEM;
-	return 0;
+	static u_char outpack[MAXPACKET];
+	register struct icmp *icp = (struct icmp *) outpack;
+	int i, cc;
+	register struct timeval *tp = (struct timeval *) &outpack[8];
+	register u_char *datap = &outpack[8+sizeof(struct timeval)];
+	icp->icmp_type = ICMP_ECHO;
+	icp->icmp_code = 0;
+	icp->icmp_cksum = 0;
+	icp->icmp_seq = ntransmitted++;
+	icp->icmp_id = ident;		/* ID */
+	cc = datalen+8;			/* skips ICMP portion */
+	if (timing)
+		gettimeofday( tp, &tz );
+	for( i=8; i<datalen; i++)	/* skip 8 for time */
+		*datap++ = i;
+	/* Compute ICMP checksum here */
+	icp->icmp_cksum = in_cksum( icp, cc );
+	/* cc = sendto(s, msg, len, flags, to, tolen) */
+	i = sendto( s, outpack, cc, 0, &whereto, sizeof(struct sockaddr) );
+	if( i < 0 || i != cc )  {
+		if( i<0 )  perror("sendto");
+		printf("ping: wrote %s %d chars, ret=%d\n",
+			hostname, cc, i );
+		fflush(stdout);
+	}
+	if(pingflags == FLOOD) {
+		putchar('.');
+		fflush(stdout);
+	}
 }
-
-static void __net_exit ping_v4_proc_exit_net(struct net *net)
+/*
+ * 			P R _ T Y P E
+ *
+ * Convert an ICMP "type" field to a printable string.
+ */
+char *
+pr_type( t )
+register int t;
 {
-	remove_proc_entry("icmp", net->proc_net);
+	static char *ttab[] = {
+		"Echo Reply",
+		"ICMP 1",
+		"ICMP 2",
+		"Dest Unreachable",
+		"Source Quench",
+		"Redirect",
+		"ICMP 6",
+		"ICMP 7",
+		"Echo",
+		"ICMP 9",
+		"ICMP 10",
+		"Time Exceeded",
+		"Parameter Problem",
+		"Timestamp",
+		"Timestamp Reply",
+		"Info Request",
+		"Info Reply"
+	};
+	if( t < 0 || t > 16 )
+		return("OUT-OF-RANGE");
+	return(ttab[t]);
 }
-
-static struct pernet_operations ping_v4_net_ops = {
-	.init = ping_v4_proc_init_net,
-	.exit = ping_v4_proc_exit_net,
-};
-
-int __init ping_proc_init(void)
+/*
+ *			P R _ P A C K
+ *
+ * Print out the packet, if it came from us.  This logic is necessary
+ * because ALL readers of the ICMP socket get a copy of ALL ICMP packets
+ * which arrive ('tis only fair).  This permits multiple copies of this
+ * program to be run without having intermingled output (or statistics!).
+ */
+pr_pack( buf, cc, from )
+char *buf;
+int cc;
+struct sockaddr_in *from;
 {
-	return register_pernet_subsys(&ping_v4_net_ops);
+	struct ip *ip;
+	register struct icmp *icp;
+	register long *lp = (long *) packet;
+	register int i;
+	struct timeval tv;
+	struct timeval *tp;
+	int hlen, triptime;
+	from->sin_addr.s_addr = ntohl( from->sin_addr.s_addr );
+	gettimeofday( &tv, &tz );
+	ip = (struct ip *) buf;
+	hlen = ip->ip_hl << 2;
+	if (cc < hlen + ICMP_MINLEN) {
+		if (pingflags & VERBOSE)
+			printf("packet too short (%d bytes) from %s\n", cc,
+				inet_ntoa(ntohl(from->sin_addr))); /* DFM */
+		return;
+	}
+	cc -= hlen;
+	icp = (struct icmp *)(buf + hlen);
+	if( (!(pingflags & QUIET)) && icp->icmp_type != ICMP_ECHOREPLY )  {
+		printf("%d bytes from %s: icmp_type=%d (%s) icmp_code=%d\n",
+		  cc, inet_ntoa(ntohl(from->sin_addr)),
+		  icp->icmp_type, pr_type(icp->icmp_type), icp->icmp_code);/*DFM*/
+		if (pingflags & VERBOSE) {
+			for( i=0; i<12; i++)
+				printf("x%2.2x: x%8.8x\n", i*sizeof(long),
+				  *lp++);
+		}
+		return;
+	}
+	if( icp->icmp_id != ident )
+		return;			/* 'Twas not our ECHO */
+
+	if (timing) {
+		tp = (struct timeval *)&icp->icmp_data[0];
+		tvsub( &tv, tp );
+		triptime = tv.tv_sec*1000+(tv.tv_usec/1000);
+		tsum += triptime;
+		if( triptime < tmin )
+			tmin = triptime;
+		if( triptime > tmax )
+			tmax = triptime;
+	}
+
+	if(!(pingflags & QUIET)) {
+		if(pingflags != FLOOD) {
+			printf("%d bytes from %s: icmp_seq=%d", cc,
+			  inet_ntoa(from->sin_addr),
+			  icp->icmp_seq );	/* DFM */
+			if (timing) 
+				printf(" time=%d ms\n", triptime );
+			else
+				putchar('\n');
+		} else {
+			putchar('\b');
+			fflush(stdout);
+		}
+	}
+	nreceived++;
 }
 
-void ping_proc_exit(void)
+
+/*
+ *			I N _ C K S U M
+ *
+ * Checksum routine for Internet Protocol family headers (C Version)
+ *
+ */
+in_cksum(addr, len)
+u_short *addr;
+int len;
 {
-	unregister_pernet_subsys(&ping_v4_net_ops);
+	register int nleft = len;
+	register u_short *w = addr;
+	register u_short answer;
+	register int sum = 0;
+
+	/*
+	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
+	 *  we add sequential 16 bit words to it, and at the end, fold
+	 *  back all the carry bits from the top 16 bits into the lower
+	 *  16 bits.
+	 */
+	while( nleft > 1 )  {
+		sum += *w++;
+		nleft -= 2;
+	}
+
+	/* mop up an odd byte, if necessary */
+	if( nleft == 1 ) {
+		u_short	u = 0;
+
+		*(u_char *)(&u) = *(u_char *)w ;
+		sum += u;
+	}
+
+	/*
+	 * add back carry outs from top 16 bits to low 16 bits
+	 */
+	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
+	sum += (sum >> 16);			/* add carry */
+	answer = ~sum;				/* truncate to 16 bits */
+	return (answer);
 }
 
+/*
+ * 			T V S U B
+ * 
+ * Subtract 2 timeval structs:  out = out - in.
+ * 
+ * Out is assumed to be >= in.
+ */
+tvsub( out, in )
+register struct timeval *out, *in;
+{
+	if( (out->tv_usec -= in->tv_usec) < 0 )   {
+		out->tv_sec--;
+		out->tv_usec += 1000000;
+	}
+	out->tv_sec -= in->tv_sec;
+}
+
+/*
+ *			F I N I S H
+ *
+ * Print out statistics, and give up.
+ * Heavily buffered STDIO is used here, so that all the statistics
+ * will be written with 1 sys-write call.  This is nice when more
+ * than one copy of the program is running on a terminal;  it prevents
+ * the statistics output from becomming intermingled.
+ */
+finish()
+{
+	putchar('\n');
+	fflush(stdout);
+	printf("\n----%s PING Statistics----\n", hostname );
+	printf("%d packets transmitted, ", ntransmitted );
+	printf("%d packets received, ", nreceived );
+	if (ntransmitted)
+		if( nreceived > ntransmitted)
+			printf("-- somebody's printing up packets!");
+		else
+			printf("%d%% packet loss", 
+			  (int) (((ntransmitted-nreceived)*100) /
+			  ntransmitted));
+	printf("\n");
+	if (nreceived && timing)
+	    printf("round-trip (ms)  min/avg/max = %d/%d/%d\n",
+		tmin,
+		tsum / nreceived,
+		tmax );
+	fflush(stdout);
+	exit(0);
+}
+//E*O*F ping.c//
+
+echo x - ping.shar
+cat > "ping.shar" << '//E*O*F ping.shar//'
+//E*O*F ping.shar//
+
+echo x - newping.1
+cat > "newping.1" << '//E*O*F newping.1//'
+.\" Copyright (c) 1985 Regents of the University of California.
+.\" All rights reserved.  The Berkeley software License Agreement
+.\" specifies the terms and conditions for redistribution.
+.\"
+.\"	@(#)ping.8	6.2 (Berkeley) 5/23/86
+.\"
+.TH PING 8 "May 23, 1986"
+.UC 6
+.SH NAME
+ping \- send ICMP ECHO_REQUEST packets to network hosts
+.SH SYNOPSIS
+.B /etc/ping
+[
+.B \-dfnqrvR
+]
+.I host
+[
+.I packetsize
+[
+.I count
+[
+.I preload
+]]]
+.SH DESCRIPTION
+The DARPA Internet is a large and complex aggregation of
+network hardware, connected together by gateways.
+Tracking a single-point hardware or software failure
+can often be difficult.
+.I Ping
+utilizes the
+ICMP protocol's mandatory ECHO_REQUEST datagram to elicit an
+ICMP ECHO_RESPONSE from a host or gateway.
+ECHO_REQUEST datagrams (``pings'') have an IP and ICMP header,
+followed by a \fBstruct timeval\fR, and then an arbitrary number
+of ``pad'' bytes used to fill out the packet.
+Default datagram length is 64 bytes, but this may be changed
+using the command-line option.
+Other options are:
+.TP
+.B \-v
+Verbose output.  ICMP packets other than ECHO RESPONSE that are received
+are listed.
+.TP
+.B \-q
+Quiet output.  Nothing is displayed except the summary line on termination.
+.TP
+.B \-n
+Numeric output only.  No attempt will be made to lookup symbolic
+names for host addresses.  Useful if your nameserver if flakey
+or for hosts not in the database.
+.TP
+.B \-f
+Flood ping.  Outputs packets as fast as they come back or one hundred times
+per second, whichever is more.  For every ECHO_REQUEST sent a period '.'
+is printed, while for ever ECHO_REPLY received a backspace is printed.
+This provides a rapid display of how many packets are being dropped.
+.TP
+.B \-R
+Record Route.  Includes the RECORD_ROUTE option in the ECHO_REQUEST
+packet and displays the route buffer on returned packets.  Note that
+the IP header is only large enough for six such routes.  Many hosts
+ignore or discard this option.
+.TP
+.B \-r
+Bypass the normal routing tables and send directly to a host on an attached
+network.
+If the host is not on a directly-attached network,
+an error is returned.
+This option can be used to ping a local host through an interface
+that has no route through it (e.g., after the interface was dropped by
+.IR routed (8C)).
+.TP
+.B \-d
+Set the SO_DEBUG option on the socket being used.
+.PP
+When using \fIping\fR for fault isolation,
+it should first be run on the local
+host, to verify that the local network interface is up and
+running.
+Then, hosts and gateways further and further away
+should be ``pinged''.
+\fIPing\fR sends one datagram per second, and
+prints one line of output for every ECHO_RESPONSE returned.
+No output is produced if there is no response.
+If an optional
+.I count
+is given, only that number of requests is sent.
+Round-trip times and packet loss statistics are computed.
+When all responses have been received or the program times out (with a
+.I count
+specified),
+or if the program is terminated with a SIGINT, a brief
+summary is displayed.
+If
+.I preload
+is given,
+.I ping
+sends that many packets as fast as possible before
+falling into its normal mode of behavior.
+.PP
+This program is intended for use in network testing, measurement
+and management.
+It should be used primarily for manual fault isolation.
+Because of the load it could impose on the network,
+it is unwise to use
+.I ping
+during normal operations or from automated scripts.
+.SH DETAILS
+For those that care.  An IP header without options in 20 bytes.
+An ICMP ECHO_REQUEST packet contains an additional 8 bytes worth
+of ICMP header followed by an arbitrary amount of data.  When a
+.I packetsize
+is given, this indicated the size of this extra blob of data (the
+default is 56).  Thus the amount of data received inside of an IP
+packet of type ICMP ECHO_REPLY will always be 8 bytes more than
+the requested data space (the ICMP header).
+.PP
+If the data space is at least eight bytes large,
+.I ping
+uses the first eight bytes of this space to include a timestamp which
+it uses in the computation of round trip times.  This explains why if
+less than eight bytes of pad are requested, no round trip times are given.
+.SH BUGS
+Far too many Hosts and Gateways (including the core gateways) ignore the
+RECORD_ROUTE option.  To quote RFC 791, "What is optional is their
+transmission in any particular datagram, not their implementation."
+.PP
+The maximum IP header length is too small for options like
+RECORD_ROUTE to be completely useful.  There's not much that
+we can do about that however.
+.PP
+Flood pinging the broadcast address is not recommended.
+.SH AUTHOR
+Mike Muuss
+.SH SEE ALSO
+netstat(1),
+ifconfig(8C)
+//E*O*F newping.1//
+echo x - newping.c
+cat > "newping.c" << '//E*O*F newping.c//'
+/*
+ *			P I N G . C
+ *
+ * Using the InterNet Control Message Protocol (ICMP) "ECHO" facility,
+ * measure round-trip-delays and packet loss across network paths.
+ *
+ * Author -
+ *	Mike Muuss
+ *	U. S. Army Ballistic Research Laboratory
+ *	December, 1983
+ * Modified at Uc Berkeley
+ * Record Route and verbose headers - Phil Dykstra, BRL, March 1988.
+ *
+ * Status -
+ *	Public Domain.  Distribution Unlimited.
+ *
+ * Bugs -
+ *	More statistics could always be gathered.
+ *	This program has to run SUID to ROOT to access the ICMP socket.
+ */
+#include <stdio.h>
+#include <errno.h>
+#include <sys/time.h>
+#include <sys/param.h>
+#include <sys/socket.h>
+#include <sys/file.h>
+#include <netinet/in_systm.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
+#include <netdb.h>
+#define	PING_MAXWAIT	10	/* max time to wait for response, sec. */
+#define	PING_MAXPACKET	4096	/* max packet size */
+#define PING_NUMERIC	1	/* return dotted quads */
+#define PING_VERBOSE	2	/* verbose flag */
+#define PING_QUIET	4	/* quiet flag */
+#define PING_DEBUG	8	/* turn on socket debugging */
+#define PING_DONTROUTE	16	/* dont route pings*/
+#define	PING_RROUTE	32	/* record route flag */
+#define PING_FLOOD	64	/* floodping flag */
+#define PING_CISCO	128	/* cisco style ping */
+#define	PING_NROUTES	9	/* number of record route slots (9 max) */
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN	64
 #endif
-
-void __init ping_init(void)
+u_char	packet[PING_MAXPACKET];
+int	i, pingflags;
+extern	int errno;
+int s;			/* Socket file descriptor */
+struct hostent *hp;	/* Pointer to host info */
+struct timezone tz;	/* leftover */
+struct sockaddr whereto;/* Who to ping */
+int datalen;		/* How much data */
+char usage[] =
+"Usage:  ping [-cdfnqrvR] host [packetsize [count [preload]]]\n";
+char *hostname;
+char hnamebuf[MAXHOSTNAMELEN];
+int npackets;
+int preload = 0;		/* number of packets to "preload" */
+int ntransmitted = 0;		/* sequence # for outbound packets = #sent */
+int ident;
+int nreceived = 0;		/* # of packets we got back */
+int timing = 0;
+int tmin = 999999999;
+int tmax = 0;
+int tsum = 0;			/* sum of all times, for doing average */
+int finish(), catcher();
+char *inet_ntoa();
+char *pr_addr();
+char rspace[3+4*PING_NROUTES+1];	/* record route space */
+/*
+ * 			M A I N
+ */
+main(argc, argv)
+char *argv[];
 {
-	int i;
-
-	for (i = 0; i < PING_HTABLE_SIZE; i++)
-		INIT_HLIST_NULLS_HEAD(&ping_table.hash[i], i);
-	rwlock_init(&ping_table.lock);
+	char **av = argv;
+	int on = 1;
+	struct sockaddr_in pktaddr;
+	struct sockaddr_in *to = (struct sockaddr_in *) &whereto;
+	struct protoent *proto;
+	int maxpkt = sizeof (packet);
+	int addrlen = sizeof (pktaddr);
+	int rcvlen, nfds, fdmask;
+	struct timeval timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 10000;
+         	argc--, av++;
+	while (argc > 0 && *av[0] == '-') {
+		while (*++av[0]) switch (*av[0]) {
+			case 'c':
+				pingflags |= PING_CISCO;
+				break;
+			case 'd':
+				pingflags |= PING_DEBUG;
+				break;
+			case 'f':
+				pingflags |= PING_FLOOD;
+				/* timeout.tv_usec = 0; */
+				break;
+			case 'n':
+				pingflags |= PING_NUMERIC;
+				break;
+			case 'q':
+				pingflags |= PING_QUIET;
+				break;
+			case 'r':
+				pingflags |= PING_DONTROUTE;
+				break;
+			case 'v':
+				pingflags |= PING_VERBOSE;
+				break;
+			case 'R':
+				pingflags |= PING_RROUTE;
+				break;
+		}
+		argc--, av++;
+	}
+	if(argc < 1 || argc > 4)  {
+		printf(usage);
+		exit(1);
+	}
+	bzero((char *)&whereto, sizeof(struct sockaddr) );
+	to->sin_family = AF_INET;
+	to->sin_addr.s_addr = inet_addr(av[0]);
+	if(to->sin_addr.s_addr != (unsigned)-1) {
+		strcpy(hnamebuf, av[0]);
+		hostname = hnamebuf;
+	} else {
+		hp = gethostbyname(av[0]);
+		if (hp) {
+			to->sin_family = hp->h_addrtype;
+			bcopy(hp->h_addr, (caddr_t)&to->sin_addr, hp->h_length);
+			strncpy( hnamebuf, hp->h_name, sizeof(hnamebuf)-1 );
+			hostname = hnamebuf;
+		} else {
+			printf("%s: unknown host %s\n", argv[0], av[0]);
+			exit(1);
+		}
+	}
+	if( argc >= 2 )
+		datalen = atoi( av[1] );
+	else
+		datalen = 64-8;
+	if (datalen > PING_MAXPACKET) {
+		fprintf(stderr, "ping: packet size too large\n");
+		exit(1);
+	}
+	if (datalen >= sizeof(struct timeval))	/* can we time 'em? */
+		timing = 1;
+	if (argc >= 3)
+		npackets = atoi(av[2]);
+	if (argc == 4)
+		preload = atoi(av[3]);
+	ident = getpid() & 0xFFFF;
+	if ((proto = getprotobyname("icmp")) == NULL) {
+		fprintf(stderr, "icmp: unknown protocol\n");
+		exit(10);
+	}
+	if ((s = socket(AF_INET, SOCK_RAW, proto->p_proto)) < 0) {
+		perror("ping: socket");
+		exit(5);
+	}
+	fdmask = 1 << s;
+	nfds = s + 1;
+	if (pingflags & PING_DEBUG) {
+		setsockopt(s, SOL_SOCKET, SO_DEBUG, &on, sizeof(on));
+	}
+	if (pingflags & PING_DONTROUTE) {
+		setsockopt(s, SOL_SOCKET, SO_DONTROUTE, &on, sizeof(on));
+	}
+	/* Record Route option */
+	if( pingflags & PING_RROUTE ) {
+#ifdef IP_OPTIONS
+		rspace[IPOPT_OPTVAL] = IPOPT_RR;
+		rspace[IPOPT_OLEN] = sizeof(rspace)-1;
+		rspace[IPOPT_OFFSET] = IPOPT_MINOFF;
+		if( setsockopt(s, IPPROTO_IP, IP_OPTIONS, rspace, sizeof(rspace)) < 0 ) {
+			perror( "Record route" );
+			exit( 42 );
+		}
+#else /* IP_OPTIONS */
+		fprintf( stderr, "ping: record route not available on this machine.\n" );
+		exit( 42 );
+#endif /* IP_OPTIONS */
+	}
+	if(to->sin_family == AF_INET) {
+		printf("PING %s (%s): %d data bytes\n", hostname,
+		  inet_ntoa(to->sin_addr.s_addr), datalen);
+	} else {
+		printf("PING %s: %d data bytes\n", hostname, datalen );
+	}
+	setlinebuf( stdout );
+	signal( SIGINT, finish );
+	signal(SIGALRM, catcher);
+	/* fire off them quickies */
+	for(i=0; i < preload; i++)
+		pinger();
+	if(pingflags & PING_FLOOD) {
+		for (;;) {
+			pinger();
+			if( select(32, &fdmask, 0, 0, &timeout) == 0)
+				continue;
+			if((rcvlen = recvfrom(s, packet, maxpkt, 0,
+			  &pktaddr, &addrlen)) < 0) {
+				if( errno != EINTR )
+					perror("\nping: recvfrom");
+				continue;
+			}
+			pr_pack( packet, rcvlen, &pktaddr );
+			if (npackets && nreceived >= npackets)
+				finish();
+		}
+	} else if(pingflags & PING_CISCO) {
+		for(;;) {
+			alarm(1);
+			pinger();
+			if((rcvlen = recvfrom(s, packet, maxpkt, 0,
+			  &pktaddr, &addrlen)) < 0) {
+				if( errno != EINTR )
+					perror("\nping: recvfrom");
+			}
+			pr_pack( packet, rcvlen, &pktaddr );
+			if (npackets && nreceived >= npackets)
+				finish();
+		}
+	} else {
+		catcher();	/* start things going */
+		for (;;) {
+			if((rcvlen = recvfrom(s, packet, maxpkt, 0,
+			  &pktaddr, &addrlen)) < 0) {
+				if( errno == EINTR )
+					continue;
+				perror("ping: recvfrom");
+				continue;
+			}
+			pr_pack( packet, rcvlen, &pktaddr );
+			if (npackets && nreceived >= npackets)
+				finish();
+		}
+	}
+	/*NOTREACHED*/
 }
+/*
+ * 			C A T C H E R
+ * 
+ * This routine causes another PING to be transmitted, and then
+ * schedules another SIGALRM for 1 second from now.
+ * 
+ * Bug -
+ * 	Our sense of time will slowly skew (ie, packets will not be launched
+ * 	exactly at 1-second intervals).  This does not affect the quality
+ *	of the delay and loss statistics.
+ */
+catcher()
+{
+	int waittime;
+	if(pingflags & PING_CISCO) {
+		putchar('!');
+		fflush(stdout);
+	}
+	pinger();
+	if (npackets == 0 || ntransmitted < npackets)
+		alarm(1);
+	else {
+		if (nreceived) {
+			waittime = 2 * tmax / 1000;
+			if (waittime == 0)
+				waittime = 1;
+		} else
+			waittime = PING_MAXWAIT;
+		signal(SIGALRM, finish);
+		alarm(waittime);
+	}
+}
+/*
+ * 			P I N G E R
+ * 
+ * Compose and transmit an ICMP ECHO REQUEST packet.  The IP packet
+ * will be added on by the kernel.  The ID field is our UNIX process ID,
+ * and the sequence number is an ascending integer.  The first 8 bytes
+ * of the data portion are used to hold a UNIX "timeval" struct in VAX
+ * byte-order, to compute the round-trip time.
+ */
+pinger()
+{
+	static u_char outpack[PING_MAXPACKET];
+	register struct icmp *icp = (struct icmp *) outpack;
+	int i, cc;
+	register struct timeval *tp = (struct timeval *) &outpack[8];
+	register u_char *datap = &outpack[8+sizeof(struct timeval)];
+	icp->icmp_type = ICMP_ECHO;
+	icp->icmp_code = 0;
+	icp->icmp_cksum = 0;
+	icp->icmp_seq = ntransmitted++;
+	icp->icmp_id = ident;		/* ID */
+	cc = datalen+8;			/* skips ICMP portion */
+	if (timing)
+		gettimeofday( tp, &tz );
+	for( i=8; i<datalen; i++)	/* skip 8 for time */
+		*datap++ = i;
+	/* Compute ICMP checksum here */
+	icp->icmp_cksum = in_cksum( icp, cc );
+	/* cc = sendto(s, msg, len, flags, to, tolen) */
+	i = sendto( s, outpack, cc, 0, &whereto, sizeof(struct sockaddr) );
+	if( i < 0 || i != cc )  {
+		if( i<0 )  perror("sendto");
+		printf("ping: wrote %s %d chars, ret=%d\n",
+			hostname, cc, i );
+		fflush(stdout);
+	}
+	if(pingflags & PING_FLOOD) {
+		putchar('.');
+		fflush(stdout);
+	}
+}
+/*
+ *			P R _ P A C K
+ *
+ * Print out the packet, if it came from us.  This logic is necessary
+ * because ALL readers of the ICMP socket get a copy of ALL ICMP packets
+ * which arrive ('tis only fair).  This permits multiple copies of this
+ * program to be run without having intermingled output (or statistics!).
+ */
+pr_pack( buf, cc, from )
+char *buf;
+int cc;
+struct sockaddr_in *from;
+{
+	struct ip *ip;
+	register struct icmp *icp;
+	register long *lp = (long *) packet;
+	register int i;
+	struct timeval tv;
+	struct timeval *tp;
+	int hlen, triptime;
+	from->sin_addr.s_addr = ntohl( from->sin_addr.s_addr );
+	gettimeofday( &tv, &tz );
+	/* Check the IP header */
+	ip = (struct ip *) buf;
+	hlen = ip->ip_hl << 2;
+	if( cc < hlen + ICMP_MINLEN ) {
+		if( pingflags & PING_VERBOSE )
+			printf("packet too short (%d bytes) from %s\n", cc,
+				inet_ntoa(ntohl(from->sin_addr.s_addr)));
+		return;
+	}
+
+	/* Now the ICMP part */
+	cc -= hlen;
+	icp = (struct icmp *)(buf + hlen);
+	if( icp->icmp_type == ICMP_ECHOREPLY ) {
+		if( icp->icmp_id != ident )
+			return;			/* 'Twas not our ECHO */
+
+		nreceived++;
+		if (timing) {
+			tp = (struct timeval *)&icp->icmp_data[0];
+			tvsub( &tv, tp );
+			triptime = tv.tv_sec*1000+(tv.tv_usec/1000);
+			tsum += triptime;
+			if( triptime < tmin )
+				tmin = triptime;
+			if( triptime > tmax )
+				tmax = triptime;
+		}
+
+		if( pingflags & PING_QUIET)
+			return;
+
+		if( pingflags & PING_FLOOD) {
+			putchar('\b');
+			fflush(stdout);
+		} else if( pingflags & PING_CISCO) {
+			putchar('.');
+			fflush(stdout);
+		} else {
+			printf("%d bytes from %s: icmp_seq=%d", cc,
+			  inet_ntoa(ntohl(from->sin_addr.s_addr)),
+			  icp->icmp_seq );
+			if (timing)
+				printf(" time=%d ms\n", triptime );
+			else
+				putchar('\n');
+		}
+	} else {
+		/* We've got something other than an ECHOREPLY */
+		if( !(pingflags & PING_VERBOSE) )
+			return;
+
+		printf("%d bytes from %s: ",
+		  cc, pr_addr(ntohl(from->sin_addr.s_addr)) );
+		pr_icmph( icp );
+	}
+
+	/* Display any IP options */
+	/* XXX - we should eventually do this for all packets with options */
+	if( hlen > 20 && icp->icmp_type == ICMP_ECHOREPLY ) {
+		unsigned char *cp;
+		/*printf("%d byte IP header:\n", hlen);*/
+		cp = (unsigned char *)buf + sizeof(struct ip) + 3;
+		for( i = 0; i < PING_NROUTES; i++ ) {
+			unsigned long l;
+			l = (*cp<<24) | (*(cp+1)<<16) | (*(cp+2)<<8) | *(cp+3);
+			/* give the nameserver a break! */
+			if( l == 0 )
+				printf("0.0.0.0\n");
+			else
+				printf("%s\n", pr_addr(ntohl(l)) );
+			cp += 4;
+		}
+	}
+}
+
+/*
+ *			I N _ C K S U M
+ *
+ * Checksum routine for Internet Protocol family headers (C Version)
+ *
+ */
+in_cksum(addr, len)
+u_short *addr;
+int len;
+{
+	register int nleft = len;
+	register u_short *w = addr;
+	register int sum = 0;
+	u_short answer = 0;
+
+	/*
+	 *  Our algorithm is simple, using a 32 bit accumulator (sum),
+	 *  we add sequential 16 bit words to it, and at the end, fold
+	 *  back all the carry bits from the top 16 bits into the lower
+	 *  16 bits.
+	 */
+	while( nleft > 1 )  {
+		sum += *w++;
+		nleft -= 2;
+	}
+
+	/* mop up an odd byte, if necessary */
+	if( nleft == 1 ) {
+		*(u_char *)(&answer) = *(u_char *)w ;
+		sum += answer;
+	}
+
+	/*
+	 * add back carry outs from top 16 bits to low 16 bits
+	 */
+	sum = (sum >> 16) + (sum & 0xffff);	/* add hi 16 to low 16 */
+	sum += (sum >> 16);			/* add possible carry */
+	answer = ~sum;		/* ones complement & truncate to 16 bits */
+	return (answer);
+}
+
+/*
+ * 			T V S U B
+ * 
+ * Subtract 2 timeval structs:  out = out - in.
+ * 
+ * Out is assumed to be >= in.
+ */
+tvsub( out, in )
+register struct timeval *out, *in;
+{
+	if( (out->tv_usec -= in->tv_usec) < 0 )   {
+		out->tv_sec--;
+		out->tv_usec += 1000000;
+	}
+	out->tv_sec -= in->tv_sec;
+}
+
+/*
+ *			F I N I S H
+ *
+ * Print out statistics, and give up.
+ * Heavily buffered STDIO is used here, so that all the statistics
+ * will be written with 1 sys-write call.  This is nice when more
+ * than one copy of the program is running on a terminal;  it prevents
+ * the statistics output from becomming intermingled.
+ */
+finish()
+{
+	putchar('\n');
+	fflush(stdout);
+	printf("\n----%s PING Statistics----\n", hostname );
+	printf("%d packets transmitted, %d packets received",
+	  ntransmitted, nreceived);
+	if (ntransmitted)
+		if( nreceived > ntransmitted)
+			printf(" -- somebody's printing up packets!\n");
+		else
+			printf(", %d%% packet loss\n", 
+			  (int) (((ntransmitted-nreceived)*100) /
+			  ntransmitted));
+	if (nreceived && timing)
+		printf("round-trip (ms)  min/avg/max = %d/%d/%d\n",
+		  tmin, tsum / nreceived, tmax);
+	fflush(stdout);
+	if (nreceived)
+		exit(0);
+	else
+		exit(1);
+}
+
+static char *ttab[] = {
+	"Echo Reply",		/* ip + seq + udata */
+	"Dest Unreachable",	/* net, host, proto, port, frag, sr + IP */
+	"Source Quench",	/* IP */
+	"Redirect",		/* redirect type, gateway, + IP  */
+	"Echo",
+	"Time Exceeded",	/* transit, frag reassem + IP */
+	"Parameter Problem",	/* pointer + IP */
+	"Timestamp",		/* id + seq + three timestamps */
+	"Timestamp Reply",	/* " */
+	"Info Request",		/* id + sq */
+	"Info Reply"		/* " */
+};
+
+/*
+ *  Print a descriptive string about an ICMP header.
+ */
+pr_icmph( icp )
+struct icmp *icp;
+{
+	switch( icp->icmp_type ) {
+	case ICMP_ECHOREPLY:
+		printf("Echo Reply\n");
+		/* XXX ID + Seq + Data */
+		break;
+	case ICMP_UNREACH:
+		switch( icp->icmp_code ) {
+		case ICMP_UNREACH_NET:
+			printf("Destination Network Unreachable\n");
+			break;
+		case ICMP_UNREACH_HOST:
+			printf("Destination Host Unreachable\n");
+			break;
+		case ICMP_UNREACH_PROTOCOL:
+			printf("Destination Protocol Unreachable\n");
+			break;
+		case ICMP_UNREACH_PORT:
+			printf("Destination Port Unreachable\n");
+			break;
+		case ICMP_UNREACH_NEEDFRAG:
+			printf("Fragmentation needed and DF set\n");
+			break;
+		case ICMP_UNREACH_SRCFAIL:
+			printf("Source Route Failed\n");
+			break;
+		default:
+			printf("Dest Unreachable, Bad Code: 0x%x\n", icp->icmp_code );
+			break;
+		}
+		/* Print returned IP header information */
+		pr_retip( icp->icmp_data );
+		break;
+	case ICMP_SOURCEQUENCH:
+		printf("Source Quench\n");
+		pr_retip( icp->icmp_data );
+		break;
+	case ICMP_REDIRECT:
+		switch( icp->icmp_code ) {
+		case ICMP_REDIRECT_NET:
+			printf("Network Redirect");
+			break;
+		case ICMP_REDIRECT_HOST:
+			printf("Host Redirect");
+			break;
+		case ICMP_REDIRECT_TOSNET:
+			printf("Type of Service and Network Redirect");
+			break;
+		case ICMP_REDIRECT_TOSHOST:
+			printf("Type of Service and Host Redirect");
+			break;
+		default:
+			printf("Redirect, Bad Code: 0x%x", icp->icmp_code );
+			break;
+		}
+		printf(" (New addr: 0x%08x)\n", icp->icmp_hun.ih_gwaddr );
+		pr_retip( icp->icmp_data );
+		break;
+	case ICMP_ECHO:
+		printf("Echo Request\n");
+		/* XXX ID + Seq + Data */
+		break;
+	case ICMP_TIMXCEED:
+		switch( icp->icmp_code ) {
+		case ICMP_TIMXCEED_INTRANS:
+			printf("Time to live exceeded in transit\n");
+			break;
+		case ICMP_TIMXCEED_REASS:
+			printf("Fragment reassembly time exceeded\n");
+			break;
+		default:
+			printf("Time exceeded, Bad Code: 0x%x\n", icp->icmp_code );
+			break;
+		}
+		pr_retip( icp->icmp_data );
+		break;
+	case ICMP_PARAMPROB:
+		switch( icp->icmp_code ) {
+		case 0:
+			printf("Parameter problem: error detected at byte 0x%02x\n",
+			  icp->icmp_hun.ih_pptr );
+		default:
+			printf("Unspecified parameter problem\n");
+		}
+		pr_retip( icp->icmp_data );
+		break;
+	case ICMP_TSTAMP:
+		printf("Timestamp\n");
+		/* XXX ID + Seq + 3 timestamps */
+		break;
+	case ICMP_TSTAMPREPLY:
+		printf("Timestamp Reply\n");
+		/* XXX ID + Seq + 3 timestamps */
+		break;
+	case ICMP_IREQ:
+		printf("Information Request\n");
+		/* XXX ID + Seq */
+		break;
+	case ICMP_IREQREPLY:
+		printf("Information Reply\n");
+		/* XXX ID + Seq */
+		break;
+	case ICMP_MASKREQ:
+		printf("Address Mask Request\n");
+		break;
+	case ICMP_MASKREPLY:
+		printf("Address Mask Reply\n");
+		break;
+	default:
+		printf("Bad ICMP type: 0x%x\n", icp->icmp_type);
+	}
+}
+
+/*
+ *  Print an IP header with options.
+ */
+pr_iph( ip )
+struct ip *ip;
+{
+	int	hlen;
+	unsigned char *cp;
+
+	hlen = ip->ip_hl << 2;
+	cp = (unsigned char *)ip + 20;	/* point to options */
+
+	printf("Vr HL TOS Len  ID   Flg Off  TTL Pro Cksm Src      Dst      Data\n");
+	printf("%1x  %1x  %02x  %04x %04x %1x   %04x %02x  %02x  %04x %08x %08x",
+	  ip->ip_v, ip->ip_hl, ip->ip_tos, ip->ip_len, ip->ip_id,
+	  ((ip->ip_off)&0xe000)>>13, (ip->ip_off)&0x1fff, ip->ip_ttl, ip->ip_p,
+	  ip->ip_sum, ntohl(ip->ip_src.s_addr), ntohl(ip->ip_dst.s_addr));
+	/* dump and option bytes */
+	while( hlen-- > 20 ) {
+		printf( "%02x", *cp++ );
+	}
+	printf("\n");
+}
+
+/*
+ *  Return an ascii host address
+ *  as a dotted quad and optionally with a hostname
+ */
+char *
+pr_addr( l )
+unsigned long l;
+{
+	struct	hostent	*hp;
+	static	char	buf[80];
+
+	if((pingflags & PING_NUMERIC) ||
+	  (hp = gethostbyaddr(&l, 4, AF_INET)) == NULL )
+		sprintf( buf, "%s", inet_ntoa(l) );
+	else
+		sprintf( buf, "%s (%s)", hp->h_name, inet_ntoa(l) );
+
+	return( buf );
+}
+
+/*
+ *  Dump some info on a returned (via ICMP) IP packet.
+ */
+pr_retip( ip )
+struct ip *ip;
+{
+	int	hlen;
+	unsigned char	*cp;
+
+	pr_iph( ip );
+	hlen = ip->ip_hl << 2;
+	cp = (unsigned char *)ip + hlen;
+
+	if( ip->ip_p == 6 ) {
+		printf( "TCP: from port %d, to port %d (decimal)\n",
+			(*cp*256+*(cp+1)), (*(cp+2)*256+*(cp+3)) );
+	} else if( ip->ip_p == 17 ) {
+		printf( "UDP: from port %d, to port %d (decimal)\n",
+			(*cp*256+*(cp+1)), (*(cp+2)*256+*(cp+3)) );
+	}
+}
+//E*O*F newping.c//
+
+exit 0
