@@ -1,0 +1,3 @@
+echo x - ping.shar
+cat > "ping.shar" << '//E*O*F ping.shar//'
+//E*O*F ping.shar//
