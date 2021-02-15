@@ -458,9 +458,7 @@ finish()
 }
 //E*O*F ping.c//
 
-echo x - ping.shar
-cat > "ping.shar" << '//E*O*F ping.shar//'
-//E*O*F ping.shar//
+
 
 echo x - newping.1
 cat > "newping.1" << '//E*O*F newping.1//'
