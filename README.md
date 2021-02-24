@@ -11,7 +11,7 @@ That is where the command line for logging in, and other stuff goes, it is in an
 #### The `bash` folder
 That is where I am (slowly but steadily) putting in the code for the bash shell from the [source tarball](https://github.com/Platypus-Tech/platypus-os-desktop-alpha/blob/main/command%20lines/bash-5.0.tar.gz).
 ### The `Desktop tools` folder
-This is where the desktop environment goes, if I could only upload a folder.
+This is where the desktop environment goes, if I could only upload a folder. 
 ### The `net` folder
 This is where internet stuff goes. I'm getting it from the Linux Kernel.
 ### The `fs` folder
@@ -39,3 +39,5 @@ See [contributing.md](contributing.md) for guidelines.
 This was the kernel, then I decided I would make this the desktop, and then the kernel repository would come along later, once this was fully developed.
 ## This has a lot of GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
 GNU/Platypus OS to avoid all the junk around GNU/Linux.
+## This branch is called bugs. Why is it called bugs?
+It has lots of intentional bugs and weaknesses
