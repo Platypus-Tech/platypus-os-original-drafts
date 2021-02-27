@@ -40,4 +40,4 @@ This was the kernel, then I decided I would make this the desktop, and then the 
 ## This has a lot of GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
 GNU/Platypus OS to avoid all the junk around GNU/Linux.
 ## This branch is called bugs. Why is it called bugs?
-It has lots of intentional bugs and weaknesses
+It has lots of intentional bugs and weaknesses for testing against malware and so I can butcher my own code in another area.
