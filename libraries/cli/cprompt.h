@@ -20,4 +20,4 @@ void prscnPrompt(){
     printf("%s", prompt);
     scanf("%s", input);
 }
-ENDIF CPROMPT_H
+#ENDIF CPROMPT_H
