@@ -4,6 +4,8 @@ The desktop for Platypus OS. Because Platypus OS is a totally new thing (Ok, may
 Note to self: needs updating BIG TIME
 ### The `.github` folder
 That's my code scanning thing and Dependabot thing.
+### The `cpu` folder
+That's where the code is for the CPU. Currently it supports ARM64.
 ### The `command lines` folder
 That is where everything relating to the command lines goes.
 #### The `platypusPrompt `folder
@@ -34,10 +36,12 @@ Currently, I cannot run this code, so I don't know what support it has. So, I'll
 2. The New Technology File System
 ### Internet
 No support, I don't think. But almost...
+### CPU
+I think it has support for ARM64.
 ***
 ## Contributing
 See [contributing.md](contributing.md) for guidelines.
 ## This used to be the kernel! What happened?
 This was the kernel, then I decided I would make this the desktop, and then the kernel repository would come along later, once this was fully developed.
 ## This has a lot of GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
-GNU/Platypus OS to avoid all the junk around GNU/Linux.
+GNU/Platypus OS to avoid all the arguments around GNU/Linux.
