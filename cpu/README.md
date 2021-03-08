@@ -6,5 +6,5 @@ Currently, I am in the process of uploading information on the CPU.
 3. x86_64
 4. PowerPC
 5. RISCV
-## What it actually supports
+## What I think it supports
 1. ARM64
