@@ -2,9 +2,9 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ negative-0.9.6 ]
+    branches: [ negative-0.9.5 ]
   pull_request:
-    branches: [ negative-0.9.6 ]
+    branches: [ negative-0.9.5 ]
 
 jobs:
   build:
