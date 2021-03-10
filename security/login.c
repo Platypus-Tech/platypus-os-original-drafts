@@ -1,6 +1,6 @@
 /********************************************************
  * This file, login.c, is licensed under the GNU GPLv3. *
- * (c) DamieFC 2021										*
+ * (c) DamieFC 2021					*
  ********************************************************/
 #include "../libraries/cli/cprompt.h"
 #include "logininfo.h"
