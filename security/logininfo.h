@@ -3,7 +3,7 @@
  * in. It's licensed under the GNU GPL version 3.                   *
  * (c) DamieFC, 2021                                                *
  ********************************************************************/
-#include "../libraries/cli/cprompt.h"
+#include "../include/common/stdio.h"
 /*
 Keeping this bit commented out JIC I still need it
 // usernames and passwords
