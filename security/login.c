@@ -2,7 +2,7 @@
  * This file, login.c, is licensed under the GNU GPLv3. *
  * (c) DamieFC 2021					*
  ********************************************************/
-#include "../libraries/cli/cprompt.h"
+#include "../libraries/cli/prompt.h"
 #include "logininfo.h"
 
 int main(){
@@ -14,13 +14,20 @@ int main(){
 		char attemptusername
 		char attemptpassword
 		scanf("%s", attemptusername);
-		if(attemptusername == rootusername){
+		if(attemptusername == passwords[1]){
 			printf("Ok, root! Password: ");
 			scanf("%s", attemptpassword);
-			if (attemptpassword == rootpass){
+			if (attemptpassword == passwords[2]){
 				printf("Hi, root! \n");
 				printf("%s", prompt);
 			}
+		}
+		else if(attemptusername == passwords[3]){
+			printf("Hey, you! Password: ")
+				else if(attemptpassword == passwords[4]){
+					printf("Hi! Glad to see you!")
+					printf("%s", prompt)
+				}
 		}
 	}
 }
