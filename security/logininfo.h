@@ -4,11 +4,17 @@
  * (c) DamieFC, 2021                                                *
  ********************************************************************/
 #include "../libraries/cli/cprompt.h"
-
+/*
+Keeping this bit commented out JIC I still need it
 // usernames and passwords
-// root users stuff
-char rootusername "root"
-char rootpass "Pl@7ypu505"
-// normal user's stuff
-char normusername "you"
-char normpass "Pl@7ypu5u53r"
+// root users' stuff
+char rootusername = "root"
+char rootpass = "Pl@7ypu505"
+// normal users' stuff
+char normusername = "you"
+char normpass = "Pl@7ypu5u53r"
+*/
+passwords[4]{
+  "root","Pl@7ypu505"
+  "you","Pl@7ypu5u53r"
+}
