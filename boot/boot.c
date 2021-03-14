@@ -24,7 +24,7 @@
  * SOFTWARE.
  */
 
-#include <boot/boot.h>
+#include "boot.h"
 #include <devices/video/vbe.h>
 #include <libk/logging.h>
 #include <memory/pmm.h>
