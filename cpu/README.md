@@ -8,3 +8,5 @@ Currently, I am in the process of uploading information on the CPU.
 5. RISCV
 ## What I think it supports
 1. ARM64
+## What I'm working on
+1. x86
