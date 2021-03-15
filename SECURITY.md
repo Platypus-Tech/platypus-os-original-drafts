@@ -5,7 +5,8 @@ Currently, there aren't a lot of versions, and this starts at -1.1.1.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| -0.9.6  | :white_check_mark: |
+| -0.9.5  | :white_check_mark: |
+| -0.9.6  | :x:                |
 | -0.9.7  | :x:                |
 | -0.9.8  | :x:                |
 | -0.9.9  | :x:                |
