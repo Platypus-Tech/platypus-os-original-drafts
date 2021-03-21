@@ -6,4 +6,8 @@
  *************************************************************/
 
 #include <errno.h>
-//<>
+#include "../include/common/stdio.h"
+
+int main(){
+    
+}
