@@ -51,12 +51,11 @@ obj-$(CONFIG_FS_MBCACHE)	+= mbcache.o
 obj-$(CONFIG_FS_POSIX_ACL)	+= posix_acl.o
 obj-$(CONFIG_COREDUMP)		+= coredump.o
 obj-$(CONFIG_SYSCTL)		+= drop_caches.o
-
+obj-$(CONFIG_FAT_FS)		+= fat/
 obj-$(CONFIG_FHANDLE)		+= fhandle.o
 obj-y				+= iomap/
 
 obj-y				+= quota/
-
 obj-$(CONFIG_PROC_FS)		+= proc/
 
 obj-$(CONFIG_DLM)		+= dlm/
@@ -68,5 +67,4 @@ obj-$(CONFIG_EXT4_FS)		+= ext4/
 # by giving the rootfstype= parameter.
 obj-$(CONFIG_FAT_FS)		+= fat/
 obj-$(CONFIG_HPFS_FS)		+= hpfs/
-obj-$(CONFIG_NTFS_FS)		+= ntfs/
 obj-$(CONFIG_UFS_FS)		+= ufs/
