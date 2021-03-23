@@ -124,4 +124,5 @@
 /* Should never be seen by user programs */
 #define ERESTARTSYS	512
 #define ERESTARTNOINTR	513
+#define ECOMMANDNOTFOUND 514 /* Command not found */
 #endif
