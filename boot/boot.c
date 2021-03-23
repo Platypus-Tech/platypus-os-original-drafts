@@ -26,7 +26,7 @@
 
 #include "boot.h"
 #include <devices/video/vbe.h>
-#include <libk/logging.h>
+#include "../libraries/emerald/graphics/libk/logging.h"
 #include <memory/pmm.h>
 
 uintptr_t convert_to_mb(uintptr_t bytes)
