@@ -39,10 +39,12 @@ This is where all the licenses go.
 ## Support for things
 Currently, I cannot run this code, so I don't know what support it has. So, I'll put what I think it supports. *If there is support for something, please let me know by editing this and making a pull request. I'll look over it and probably merge it, or work with you on it. I'm pretty active here so I'll get to you within a reasonable amount of time, never more than a day, unless it's the weekend. Then it might take until Monday.*
 ### Filesystems
-1. The Unix Filesystem
-2. The New Technology File System
+1. UFS
+2. FAT
+3. EXT4
+4. HPFS
 ### Internet
-No support, I don't think. But almost...
+I believe there is support for internet stuff.
 ### CPU
 I think it has support for ARM64.
 ***
