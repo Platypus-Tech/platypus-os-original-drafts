@@ -2,11 +2,11 @@
 Currently, I am in the process of uploading information on the CPU.
 ## What I want it to support
 1. ARM
-2. x86
-3. x86_64
-4. PowerPC
-5. RISCV
+2. PowerPC
+3. RISCV
+4. AMD
 ## What I think it supports
 1. ARM64
+2. x86_32/64
 ## What I'm working on
-1. x86
+Nothing right now
