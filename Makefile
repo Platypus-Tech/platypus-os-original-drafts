@@ -1,7 +1,7 @@
 # Yeah, I'm gonna try to make a makefile. Let's see how bad I screw up.
 
-NAME = "Eeek6"
-EXTRAVERSION = "rc6"
+NAME = "-0.9.5"
+EXTRAVERSION = 
 
 # The one file here at platypus-os-desktop-pre-alpha/
 # :)
