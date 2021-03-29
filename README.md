@@ -20,7 +20,7 @@ Currently, I cannot run this code, so I don't know what support it has. So, I'll
 ### Internet
 I believe there is support for internet stuff.
 ### CPU
-I think it has support for ARM64.
+I think it has support for ARM64 and now x86.
 ***
 ## Contributing
 See [contributing.md](contributing.md) for guidelines.
