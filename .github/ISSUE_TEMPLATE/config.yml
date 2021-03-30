@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+# You can't open a blank issue
+contact_links:
+  - name: DFC
+    url: mailto:dtortoise99@gmail.com
+    about: My email for asking questions (please do not use unless you want to ask something in private)
+  - name: GitHub Discussions
+    url: https://github.com/Platypus-Tech/platypus-os-desktop-pre-alpha/discussions
+    about: Ask questions, discuss code, and talk
