@@ -1,3 +1,7 @@
+/************************************************************
+ * This file I got from Linux Journal.                      *
+ ************************************************************/
+
 static struct usb_driver led_driver = {
 	.owner =	THIS_MODULE,
 	.name =		"usbled",
