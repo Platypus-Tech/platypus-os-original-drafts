@@ -1,6 +1,6 @@
 # Yeah, I'm gonna try to make a makefile. Let's see how bad I screw up.
 
-NAME = "-0.9.5"
+NAME = "-0.9.4"
 EXTRAVERSION = 0
 
 # The one file here at platypus-os-desktop-pre-alpha/
@@ -11,6 +11,7 @@ obj-y += foo-bar.o
 # ALLLLLL the folders :\
 
 obj-$(CONFIG_CPU) += cpu/
+obj-$(CONFIG_ENCRYPTION) += encryption/
 obj-$(CONFIG_DEVICES) += devices/
 obj-$(CONFIG_DOCUMENTATION) += documentation/
 obj-$(CONFIG_FS) += fs/
