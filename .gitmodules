@@ -1,0 +1,4 @@
+[submodule "bash"]
+	path = cli/bash
+	url = https://github.com/bminor/bash
+	branch = master
