@@ -1,4 +1,4 @@
-#include "dfc.h"
+#include "../../include/cli/dfc.h"
 #include "../../include/cli/prompt.h"
 
 int main() {
