@@ -5,7 +5,7 @@
 
 #include "../../../../include/common/time.h"
 #include "../../../../include/cli/prompt.h"
-#include <stdlib.h>
+#include "../../../../include/common/stdlib.h"
 
 int main(void)
 {
