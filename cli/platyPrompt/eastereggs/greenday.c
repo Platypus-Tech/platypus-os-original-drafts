@@ -4,7 +4,7 @@
  * as you keep the same license or a compatable license. Green Day *
  * is a trademark of Green Day, inc. Don't say I didn't warn you.  *
  *******************************************************************/
-#include "cprompt.h"
+#include "../../../include/cli/prompt.h"
 
 int main(){
 	prscnPrompt();
