@@ -12,12 +12,12 @@ char input;
 
 // char fs = filesystem location;
 
-prompt = "you@platypusos:~#"
+prompt = "you@platypusos:~#";
 
 void prscnPrompt();
 
 void prscnPrompt(){
     printf("%s", prompt);
-    scanf("%s", input);
+    gets("%s", input);
 }
 #ENDIF /* PROMPT_H */
