@@ -1,4 +1,4 @@
-#include "../../libraries/cli/cprompt.h"
+#include "../../../libraries/cli/cprompt.h"
 
 int main(){
 	prscnPrompt();
