@@ -1,5 +1,5 @@
 #include "panic.h"
-#include <devices/video/vbe.h>
+#include "../devices/emerald/video/vbe.h"
 #include "../libraries/graphics/emerald/libk/logging.h"
 #include "../libraries/graphics/emerald/libk/random.h"
 char *comments_lol[] =
