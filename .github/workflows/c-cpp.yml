@@ -4,7 +4,7 @@ on:
   push:
     branches: [ negative-0.9.2 ]
   pull_request:
-    branches: [ negative-0.9.4 ]
+    branches: [ negative-0.9.2 ]
 
 jobs:
   build:
