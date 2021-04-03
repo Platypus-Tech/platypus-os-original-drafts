@@ -28,13 +28,14 @@ char *comments_somewhat_serious[] =
     "Memory out.",
     "CPU got to hot",
     "Ok, seriously, I have no idea what happened",
-    "Buffer overflow"
+    "Buffer overflow",
+    "No power :\"
 };
 void __panic(char *file, const char function[20], int line, char *message)
 {
-    static Color bg_color = {0, 64, 73};
+    static Color blueScreen = {0, 0, 255};
 
-    VBE_clear_screen(0,bg_color);
+    VBE_clear_screen(0,blueScreen);
 
     __asm__("cli");
 
@@ -43,11 +44,11 @@ void __panic(char *file, const char function[20], int line, char *message)
     VBE_puts("------------------------------------------------------------------------\n", red);
     VBE_puts("KERNEL PANIC\n", red);
     VBE_cputf(gray, " /* %s */", comments_lol[rand() % 17]);
-    VBE_cputf(blue, "%s", message);
+    VBE_cputf(red, "%s", message);
     VBE_putf("In %s at %s(), line %d", file, function, line);
     VBE_puts("And this too", red);
     VBE_cputf(gray, "/* %s */", comments_somewhat_serious[rand()] % 17);
-    VBE_cputf(blue, "%s", message);
+    VBE_cputf(red, "%s", message);
     VBE_putf("In %s at %s(), line %d", file, function, line);
 
     while (1)
