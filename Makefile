@@ -1,7 +1,7 @@
 # Yeah, I'm gonna try to make a makefile. Let's see how bad I screw up.
 
-NAME = "-0.9.3"
-EXTRAVERSION = 
+NAME = "-0.9.2"
+EXTRAVERSION = "rc1"
 
 # The one file here at platypus-os-desktop-pre-alpha/
 # :)
