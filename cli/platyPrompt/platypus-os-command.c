@@ -10,7 +10,6 @@
 // The always important "stdio.h" header file
 #include "../../include/cli/prompt.h"
 int main(){
-    prscnPrompt();
 	if (input == "platypusOS" || "Platypus OS" || "PlatypusOS" || "PLATYPUSOS" || "PlAtYpUsOs" || "pLaTyPuS oS" || "pLATYPUS os" || "pLATYPUSos" || "Platypus-OS" || "platypus-OS"){     /* it's good to have 	flexibility, but there's only so much you can provide. Other flexibility is appreciated.*/
 	/*	printf("PPPPPPPPPPPPb       LL                     :::         TTTTTTTTTTTT          YYY             	YYY       PPPPPPPPPPPPb        UU            UU        5555555555555             OOOOOOO          	SSSSSSSSSS /n")
 	printf("PP          P       LL                    AAAAA             TT                YYY           YYY         PP          P         UU          UU          55                      OO     OO          SS /n") I'm 	trying to write Platypus OS in ASCII. */
@@ -24,6 +23,7 @@ int main(){
 		else{
 			printf("Wut? \n");
 			printf("%s", prompt);
+			prscnPrompt();
 		}
 	}
 }
