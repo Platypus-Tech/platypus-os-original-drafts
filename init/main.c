@@ -8,7 +8,7 @@
 #inlcude "../../devices/emerald/keyboard/keyboard.h"
 #include "../../libraries/graphics/emerald/libk/module.h"
 #include "../../libraries/graphics/emerald/libk/logging.h"
-#include <unistd.h>
+#include "../include/common/unistd.h"
 
 int main(){
     module("startup");
@@ -21,5 +21,6 @@ int main(){
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
     /* I think this should immediatly execute the cmd prompt. */
-    exec("../../cli/platyPrompt/internal/main.c")
+    exec("../../cli/platyPrompt/internal/main.c");
+    log(INFO, "Shell executed"); /* Yay */
 }
