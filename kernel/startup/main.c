@@ -8,7 +8,7 @@
 #inlcude "../../devices/emerald/keyboard/keyboard.h"
 #include "../../libraries/graphics/emerald/libk/module.h"
 #include "../../libraries/graphics/emerald/libk/logging.h"
-
+#include <unistd.h>
 
 int main(){
     module("startup");
@@ -21,4 +21,6 @@ int main(){
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
     /* Now that that's done, I want to be able to run a main.c file so platyPrompt starts, could I have some help with that? */
+    /* Update about 10 minutes later: I think I figured it out (If not, pls help): */
+    exec("../../cli/platyPrompt/internal/main.c")
 }
