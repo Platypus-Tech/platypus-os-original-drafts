@@ -23,3 +23,9 @@ obj-$(CONFIG_EMGRAPH) += libraries/graphics/emerald/libk/
 obj-$(CONFIG_MEMORY) += memory/
 obj-$(CONFIG_INTERNET) += net/
 obj-$(CONFIG_SECURITY) += security/
+
+# I'm gonna experiment with execution of stuff :)
+
+# Bootup message
+
+obj-y += kernel/startup/main.c
