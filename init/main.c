@@ -17,12 +17,14 @@ int main(){
     
     VBE_clear_screen(1, black); /* Black background */
     Keyboard_init();
-    VBE_puts("Keyboard initialized...\n");
+    VBE_puts("Keyboard initialized...\n", white);
     /* log(INFO, "Keyboard initialized");  I'm not sure whether to put the logger before the text or after, this logger is in the function. */
     PCSpkr_init();
     VBE_puts("PCSpkr initialized...\n");
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
+    VBE_puts("Other info: \n", white);
+    VBE_puts("Version: 0.9.2-rc2\n", white);
     /* I think this should immediatly execute the cmd prompt. */
     exec("../../cli/platyPrompt/internal/main.c");
     log(INFO, "Shell executed"); /* Yay */
