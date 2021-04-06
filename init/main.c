@@ -25,7 +25,7 @@ int main(){
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
     VBE_puts("Other info: \n", white);
-    VBE_puts("Version: %s\n", white, version); /* I wonder if this works with a variable after the color. */
+    VBE_cputf(white, "Version: %s\n", version); /* cputf() for this one */
     /* I think this should immediatly execute the cmd prompt. */
     exec("../../cli/platyPrompt/internal/main.c");
     log(INFO, "Shell executed"); /* Yay */
