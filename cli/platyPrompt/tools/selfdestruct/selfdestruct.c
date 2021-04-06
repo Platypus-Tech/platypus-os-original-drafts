@@ -2,7 +2,7 @@
  * This file, selfdestruct.c is licensed under the GNU GPLv3.    *
  * (c) DamieFC, 2021                                             *
  *****************************************************************/
-#include "../libraries/cli/prompt.h"
+#include "../include/cli/prompt.h"
 
 int main(){
 	if (input == "self-destruct"){
