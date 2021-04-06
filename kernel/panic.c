@@ -19,7 +19,8 @@ char *comments_lol[] =
         "To boot or not to boot.",
         ":(",
         "Kernel is not in the sudoers file. This incident will be reported.",
-        "Error Code: INSERT_FUNNY_THING_HERE"
+        "Error Code: INSERT_FUNNY_THING_HERE",
+        "Screen not found"
 
 };
 
@@ -51,6 +52,6 @@ void __panic(char *file, const char function[20], int line, char *message)
     VBE_cputf(red, "%s", message);
     VBE_putf("In %s at %s(), line %d", file, function, line);
 
-    while (1)
-        ;
+    //while (1)
+        //;
 }
