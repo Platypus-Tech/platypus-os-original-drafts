@@ -4,4 +4,4 @@ Platypus OS is a pentesting/programming OS. Currently it is under active develop
 ## Contributors
 * TIBTHINK [(https://github.com/TIBTHINK)](https://github.com/TIBTHINK)
 ## Documentation
-* [Building](doc/build.md)
+* [Building](doc/build/build.md)
