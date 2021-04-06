@@ -6,6 +6,7 @@
  ********************************************************************/
 #include "../../devices/emerald/video/vbe.h"
 #inlcude "../../devices/emerald/keyboard/keyboard.h"
+#include "../../devices/emerald/pcspkr/pcspkr.h"
 #include "../../libraries/graphics/emerald/libk/module.h"
 #include "../../libraries/graphics/emerald/libk/logging.h"
 #include "../include/common/unistd.h"
@@ -17,7 +18,9 @@ int main(){
     VBE_clear_screen(1, black); /* Black background */
     Keyboard_init();
     VBE_puts("Keyboard initialized...\n");
-    log(INFO, "Keyboard initialized"); /* I'm not sure whether to put the logger before the text or after */
+    /* log(INFO, "Keyboard initialized");  I'm not sure whether to put the logger before the text or after, this logger is in the function. */
+    PCSpkr_init();
+    VBE_puts("PCSpkr initialized...\n");
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
     /* I think this should immediatly execute the cmd prompt. */
