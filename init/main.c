@@ -4,6 +4,7 @@
  *******                                                      *******
  * Has the stuff for when the system boots up.                      *
  ********************************************************************/
+#include "version.h"
 #include "../../devices/emerald/video/vbe.h"
 #inlcude "../../devices/emerald/keyboard/keyboard.h"
 #include "../../devices/emerald/pcspkr/pcspkr.h"
@@ -24,7 +25,7 @@ int main(){
     VBE_puts("WELCOME TO PLATYPUS OS I DON'T KNOW WHY I TYPED THIS IN CAPS.\n", white); /* Obnoxious caps text */
     log(INFO, "Obnoxious caps text printed"); /* This one was easy */
     VBE_puts("Other info: \n", white);
-    VBE_puts("Version: 0.9.2-rc2\n", white);
+    VBE_puts("Version: %s\n", white, version); /* I wonder if this works with a variable after the color. */
     /* I think this should immediatly execute the cmd prompt. */
     exec("../../cli/platyPrompt/internal/main.c");
     log(INFO, "Shell executed"); /* Yay */
