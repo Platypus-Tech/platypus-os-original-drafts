@@ -34,6 +34,7 @@
     __typeof__(B) _b_ = B;   \
     (_a_ + (_b_ - 1)) / _b_; \
 })
+#define BIT_CLEAR(__bit) (bitmap.buffer[(__bit) / 8] &= ~(1 << ((__bit) % 8)))
 
 Bitmap bitmap;
 
@@ -90,51 +91,42 @@ void PMM_init(struct stivale2_mmap_entry *memory_map, size_t memory_entries, Boo
 
     /* Populating free entries */
     size_t j;
-
+    uintptr_t k;
     for (j = 0; j < memory_entries; j++)
     {
 
         if (memory_map[j].type != STIVALE2_MMAP_USABLE)
             continue;
 
-	log(INFO,"%x",memory_map[j].length / PAGE_SIZE);
-	
-        bitmap.set_free(memory_map[j].base / PAGE_SIZE, memory_map[j].length / PAGE_SIZE, &bitmap);
-	
-	log(INFO,"%d",j);
+        for (k = 0; k < memory_map[j].length; k += PAGE_SIZE)
+            BIT_CLEAR((memory_map[j].base + k) / PAGE_SIZE);
     }
-    
+
     module("PMM");
 
     log(INFO, "initialized!");
 }
+
 void *PMM_allocate(uint64_t count)
 {
 
     uint64_t res = bitmap.allocate(count, &bitmap);
-
-    if (count > 1)
-    {
-        log(INFO, "Allocated %d pages", count);
-    }
-    else
-        log(INFO, "Allocated %d page", count);
 
     return (void *)(res * PAGE_SIZE);
 }
 
 void *PMM_allocate_zero(uint64_t count)
 {
-    void *d = PMM_allocate(count);
+    char *ret = (char *)PMM_allocate(count);
 
-    uint64_t *pages = (uint64_t *)(MEM_OFFSET + (uint64_t)d);
+    if (!ret)
+        return NULL;
 
-    uint64_t i;
+    uint64_t *ptr = (uint64_t *)(ret + MEM_OFFSET);
 
-    for (i = 0; i < (count * PAGE_SIZE) / sizeof(uint64_t); i++)
-    {
-        pages[i] = 0;
-    }
+    size_t i;
+    for (i = 0; i < count * (PAGE_SIZE / sizeof(uint64_t)); i++)
+        ptr[i] = 0;
 
-    return d;
+    return ret;
 }
