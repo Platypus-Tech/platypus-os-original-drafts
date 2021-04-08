@@ -3,19 +3,31 @@
  * Platypus OS shell, "help".									 *
  *****************************************************************/
 #include "../../include/cli/prompt.h"
-// A few important variables
-if (input == "help" || "HELP" || "Help" || "HeLp" || "hELP" || "hElP" || "help!" || "Help!" || "HELP!" || "hELP!" || "HeLp!" || "hElP"){
-	printf("This is the Platypus OS command line. There are a few things that you need to know: \n");
-	printf("1. You can login using the 'login' command \n");
-	printf("2. This is still in development, but it is still usable \n");
-	printf("3. You can get the version of this by adding '-v' at the end of the command \n");
-	printf("%s", prompt);
-}
-else{
-		printf("huh? \n");
-		prscnPrompt();
-}
-if (input =="help -v" || "HELP -v" || "Help -v" || "HeLp -v" || "hELP -v" || "hElP -v" || "help! -v" || "Help! -v" || "HELP! -v" || "hELP! -v" || "HeLp! -v" || "hElP -v"){
-	printf("-0.9.4-rc2 \n");
-	printf("%s", prompt);
+#include <string.h>
+// Can use either no arguments, or -v for version
+
+// pass command line arguments
+int main(int argc, char *argv[]) {
+
+	// check for valid number of argments passed
+	// if 0 arguments passed
+	if (argc == 1) {
+		printf("This is the Platypus OS command line. There are a few things that you need to know: \n"
+		"1. You can login using the 'login' command \n"
+		"2. This is still in development, but it is still usable \n"
+		"3. You can get the version of this by adding '-v' at the end of the command \n");
+
+	} // if 1 argument is passed
+	else if (argc == 2) {
+	
+		// compare command line arguments instead of having to use a nested prompt
+		if (! strcmp(argv[1],"-v")) {
+			printf("version -0.9.4-rc2 \n");
+		} else { 
+			printf("huh? \n"); // if one argument is passed but is invalid
+		}
+	// if invalid number of arguments
+	} else {
+		printf("Invalid number of arguments. Please input either one or zero arguments.\n");
+	}
 }
