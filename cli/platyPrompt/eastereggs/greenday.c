@@ -7,10 +7,6 @@
 #include "../../../include/cli/prompt.h"
 
 int main(){
-	prscnPrompt();
-	if (input == "greenday"){
-		printf("They're on on my favorite bands! I mainly like 39/Smooth, Dookie, and American Idiot.");
-		printf("Why'd you mention them?");
-		printf("%s", prompt);
-	}
+	printf("They're on on my favorite bands! I mainly like 39/Smooth, Dookie, and American Idiot."
+	"Why'd you mention them?");
 }
