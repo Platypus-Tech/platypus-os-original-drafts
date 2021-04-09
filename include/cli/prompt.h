@@ -20,13 +20,13 @@ FILE *getpwd;
 char *command = "pwd";
 char c = 0;
 char str[];
-char input;
+char input[];
 
 getpwd = (FILE*)popen(command, "r");
 while (fread(&c, sizeof c, 1, getpwd)) {
     strncat(str, &c, 1);
 }
-prompt = "you@platypusos:";
+char prompt[] = "you@platypusos:";
 
 void prscnPrompt();
 
