@@ -3,4 +3,4 @@
  * This code is used in main.c for printing the version.                             *
  *************************************************************************************/
 
-char version = "0.9.2-rc2";
+char version[] = "0.9.2-rc2";
