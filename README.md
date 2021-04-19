@@ -1,4 +1,4 @@
-# Platypus OS Desktop
+<!--# Platypus OS Desktop
 The desktop for Platypus OS. Because Platypus OS is a totally new thing (Ok, maybe not totally, there are some, actually, a lot of files from the Linux kernel), it has an (almost) totally new kernel, and this is the desktop OS. This is where it all goes. NOTE, ***THIS IS IN PRE ALPHA STAGE WHICH ISN'T EVEN A THING. IF YOU INSTALL IT, AND WHEN IT CRASHES, IT'S NOT MY FAULT. THANK YOU GNU PROJECT FOR PUTTING THAT IN YOUR LICENSE. THAT'S WHY I DON'T HAVE INSTRUCTIONS ON INSTALLING.*** See the file "version.txt" for what version you have. (What? All the GNU projects have it, except it's `version.h`.)
 ## What this is
 Platypus OS is an in-development OS for the following:
@@ -6,7 +6,7 @@ Platypus OS is an in-development OS for the following:
 * Programming
 * Playing video games
 
-It's a weird combination, but that's what I like to do: pentest, program, and play video games.
+<!--It's a weird combination, but that's what I like to do: pentest, program, and play video games.
 ## How to get around/Navigation
 See [`navigation.md`](/documentation/navigation.md)
 ***
@@ -27,4 +27,6 @@ See [contributing.md](contributing.md) for guidelines.
 ## This used to be the kernel! What happened?
 This was the kernel, then I decided I would make this the desktop, and then the kernel repository would come along later, once this was fully developed.
 ## This has a lot of GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
-GNU/Platypus OS to avoid all the arguments around GNU/Linux.
+GNU/Platypus OS to avoid all the arguments around GNU/Linux. -->
+# Notice
+I may be ceasing development of Platypus OS. I realize I do not know enough about OS programming, or programming in general, to proceed. It is possible that once I learn more, it will continue, but for right now, I think I am going to stop, or maybe do it another way.
