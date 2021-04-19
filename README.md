@@ -29,4 +29,4 @@ This was the kernel, then I decided I would make this the desktop, and then the 
 ## This has a lot of GNU. When this is deployed, will it just be called "Platypus OS" or "GNU/Platypus OS"?
 GNU/Platypus OS to avoid all the arguments around GNU/Linux. -->
 # Notice
-I may be ceasing development of Platypus OS. I realize I do not know enough about OS programming, or programming in general, to proceed. It is possible that once I learn more, it will continue, but for right now, I think I am going to stop, or maybe do it another way.
+I may be ceasing development of Platypus OS. I realize I do not know enough about OS programming, or programming in general, to proceed. It is possible that once I learn more, it will continue, but for right now, I think I am going to stop, or maybe do it another way. Thank you to [@berg95](https://github.com/berg95) for contributing to the CLI, and thank you to [@TIBTHINK](https://github.com/TIBTHINK) for offering to help with the project.
