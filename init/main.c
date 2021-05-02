@@ -12,7 +12,7 @@
 #include "../../libraries/graphics/emerald/libk/logging.h"
 #include "../include/common/unistd.h"
 
-int main(){
+void kmain(){
     module("startup");
     static Color white = {255, 255, 255} black = {0, 0, 0};
     
